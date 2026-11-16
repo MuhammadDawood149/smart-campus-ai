@@ -74,7 +74,8 @@
           </div>
           <label class="demo-picker">
             <span>Demo scenarios</span>
-            <select id="demo-select"><option value="">Choose a scenario to run…</option></select>
+            <select id="demo-select" aria-describedby="demo-note"><option value="">Choose a scenario to run…</option></select>
+            <small class="demo-note" id="demo-note">Demo scenarios start from the initial bookings</small>
           </label>
         </div>
 
@@ -440,17 +441,17 @@
               <select id="a-role"><option value="0">Student</option><option value="1">Instructor</option><option value="2">Staff</option></select>
             </div>
             <div class="field">
-              <label for="a-type">Request type</label>
+              <label for="a-type">Request category</label>
               <select id="a-type">
-                <option value="0">Navigation only</option><option value="1">Eligibility check</option>
-                <option value="2">Booking / scheduling</option><option value="3">Urgent service</option>
-                <option value="4" selected>Full service</option>
+                <option value="0" selected>AI Lab Support</option><option value="1">Viva Scheduling</option>
+                <option value="2">Access Request</option><option value="3">Maintenance</option>
+                <option value="4">Emergency Help</option>
               </select>
             </div>
             <div class="field slider-field"><label for="a-sev">Severity <output for="a-sev">8</output></label><input id="a-sev" type="range" min="1" max="10" value="8"></div>
             <div class="field slider-field"><label for="a-time">Time sensitivity <output for="a-time">9</output></label><input id="a-time" type="range" min="1" max="10" value="9"></div>
             <div class="field slider-field"><label for="a-crowd">Crowd level <output for="a-crowd">5</output></label><input id="a-crowd" type="range" min="1" max="10" value="5"></div>
-            <div class="field slider-field"><label for="a-dist">Distance (route cost) <output for="a-dist">6</output></label><input id="a-dist" type="range" min="0" max="20" value="6"></div>
+            <div class="field slider-field"><label for="a-dist">Distance (route cost) <output for="a-dist">6</output></label><input id="a-dist" type="range" min="0" max="15" value="6"></div>
             <label class="check">
               <input type="checkbox" id="a-elig" checked><span class="check-box" aria-hidden="true"></span><span>Eligible</span>
             </label>

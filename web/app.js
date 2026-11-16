@@ -94,14 +94,14 @@ const ROOMS = ['AI_Lab', 'Exam_Hall', 'Seminar_Room', 'Admin_Block', 'Student_Se
 const SLOT_TIMES = { 1: '09:00', 2: '10:30', 3: '13:00', 4: '14:30' };
 const DEADLINE = { urgent: 2, high: 3, normal: 4, low: 4 };
 const ROLE_IDX = { student: 0, instructor: 1, staff: 2 };
-const QUERY_EXAMPLES = ['UsesLab(DrKhan, Lab1)', 'Eligible(Sara, AI)', 'UsesLab(x, Lab1)', 'CanRequest(Ali, AI_Lab_Support)', 'CanBookViva(Ahmed, G4)'];
+const QUERY_EXAMPLES = ['UsesLab(DrKhan, Lab1)', 'Eligible(Sara, AI)', 'UsesLab(x, Lab1)', 'CanRequest(Ali, AI_Lab_Support)', 'CanScheduleViva(Ahmed, G4)'];
 const MOD_VAR = { ANN: '--ann', Logic_KB: '--logic', CSP: '--csp', Search: '--search' };
 
 const REQUEST_TYPES = [
   { value: 'Navigation_Only', name: 'Navigation', desc: 'Route between two campus places', mods: ['Search'] },
   { value: 'Eligibility_Check', name: 'Eligibility check', desc: 'Ask the knowledge base', mods: ['Logic_KB'] },
   { value: 'Booking_or_Scheduling', name: 'Booking / scheduling', desc: 'Reserve a room or viva slot', mods: ['Logic_KB', 'CSP', 'Search'] },
-  { value: 'Urgent_Service_Request', name: 'Urgent service', desc: 'Prioritised help, now', mods: ['ANN', 'Logic_KB', 'Search'] },
+  { value: 'Urgent_Service_Request', name: 'Urgent service', desc: 'Prioritised help, now', mods: ['ANN', 'Logic_KB', 'CSP', 'Search'] },
   { value: 'Full_Service_Request', name: 'Full service', desc: 'Every module: priority, eligibility, slot and route', mods: ['ANN', 'Logic_KB', 'CSP', 'Search'] },
 ];
 const TYPE_PIPE = Object.fromEntries(REQUEST_TYPES.map((t) => [t.value, t.mods]));
@@ -206,7 +206,7 @@ function buildForm() {
     if (!d) return;
     fillForm(d.request);
     await sleep(420);
-    submitForm();
+    submitForm({ demo: true });
   });
   updateFields(true);
 }
@@ -254,7 +254,7 @@ function collectForm() {
   const f = $('#req-form');
   const body = { name: f.name.value.trim(), role: f.role.value, request_type: currentType() };
   $$('.dyn', f).forEach((d) => {
-    if (d.hidden || d.classList.contains('is-hidden')) return;
+    if (d.hidden || d.inert) return; // inert is set at once; the is-hidden class lags by two frames
     $$('input, select, textarea', d).forEach((inp) => {
       if (!inp.name) return;
       if (inp.type === 'radio') { if (inp.checked && inp.value !== '') body[inp.name] = +inp.value; return; }
@@ -273,6 +273,8 @@ function fillForm(req) {
   f.role.value = req.role || 'student';
   const radio = $(`input[name="request_type"][value="${req.request_type}"]`);
   if (radio) radio.checked = true;
+  // No preferred slot in the scenario -> "None" (updateFields switches back to 2 where a slot is required)
+  if (req.preferred_slot == null) $('input[name="preferred_slot"][value=""]').checked = true;
   for (const [k, v] of Object.entries(req)) {
     if (['name', 'role', 'request_type'].includes(k)) continue;
     const el = f.elements[k];
@@ -300,11 +302,14 @@ function clearForm(resetType = true) {
   if (resetType) { $('input[name="request_type"]').checked = true; updateFields(); }
 }
 
-async function submitForm() {
+// A demo scenario first resets the bookings (request ids keep counting), like cli.py's
+// demo mode, so it always gives its documented result. Manual requests use live bookings.
+async function submitForm({ demo = false } = {}) {
   const body = collectForm();
   const btn = $('#submit-btn');
   btn.classList.add('is-busy');
-  const res = await safe(() => API.submitRequest(body), 'Request failed');
+  const ready = !demo || await safe(() => API.resetBookings(), 'Could not reset bookings');
+  const res = ready ? await safe(() => API.submitRequest(body), 'Request failed') : null;
   btn.classList.remove('is-busy');
   $('#demo-select').value = '';
   if (!res) return;
@@ -602,7 +607,7 @@ function openCSP(res) {
 function openANN(res, body) {
   go('ann');
   const feats = res.priority?.features || [
-    ROLE_IDX[body.role] ?? 0, REQUEST_TYPES.findIndex((t) => t.value === body.request_type),
+    ROLE_IDX[body.role] ?? 0, Math.max(0, CATEGORIES.indexOf(body.category)),
     body.severity ?? 5, body.time_sensitivity ?? 5, body.crowd_level ?? 5, res.route?.cost ?? 0, body.eligibility ? 1 : 0,
   ];
   setAnnInputs(feats);
@@ -950,7 +955,8 @@ async function animateBooking(a, reqId) {
 function buildCSP() {
   $('#try-booking').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const body = { name: 'Walk-in', role: 'staff', request_type: 'Booking_or_Scheduling', category: $('#tb-cat').value, preferred_slot: +$('#tb-slot').value };
+    // DrKhan (instructor) may request every non-viva category in the KB (R9, R13, R14, R15).
+    const body = { name: 'DrKhan', role: 'instructor', request_type: 'Booking_or_Scheduling', category: $('#tb-cat').value, preferred_slot: +$('#tb-slot').value };
     const res = await safe(() => API.submitRequest(body), 'Booking failed');
     if (!res) return;
     recordHistory(res, body);
@@ -1225,7 +1231,8 @@ function setAnnInputs(f) {
   [['#a-sev', 2], ['#a-time', 3], ['#a-crowd', 4], ['#a-dist', 5]].forEach(([id, i]) => { $(id).value = f[i]; syncRange($(id)); });
   $('#a-elig').checked = !!f[6];
 }
-const normInputs = (f) => [f[0] / 2, f[1] / 4, (f[2] - 1) / 9, (f[3] - 1) / 9, (f[4] - 1) / 9, Math.min(f[5], 20) / 20, f[6] ? 1 : 0];
+// Same scaling as the ANN (divide by FEATURE_MAX); the live API also returns scaled_features.
+const normInputs = (f) => [f[0] / 2, f[1] / 4, f[2] / 10, f[3] / 10, f[4] / 10, Math.min(f[5], 15) / 15, f[6] ? 1 : 0];
 
 async function runPredict() {
   const run = ++S.runs.ann;
@@ -1238,7 +1245,7 @@ async function runPredict() {
   $$('#prob-bars .track i').forEach((i) => { i.style.width = '0'; });
   $('#ann-verdict').innerHTML = '';
   const probs = res.probabilities || {};
-  const layers = [normInputs(feats), res.activations?.hidden1 || [], res.activations?.hidden2 || [], ANN_OUT.map((k) => probs[k] || 0)];
+  const layers = [res.scaled_features || normInputs(feats), res.activations?.hidden1 || [], res.activations?.hidden2 || [], ANN_OUT.map((k) => probs[k] || 0)];
   for (let l = 0; l < layers.length; l++) {
     if (run !== S.runs.ann) return;
     annRefs.neurons[l].forEach((g, i) => setNeuron(g, layers[l][i] ?? 0));
@@ -1292,7 +1299,7 @@ function buildPerceptron() {
 }
 async function animatePerceptron(feats, res, run) {
   const p = res.perceptron;
-  const x = normInputs(feats);
+  const x = res.scaled_features || normInputs(feats);
   percRefs.inputs.forEach((c, i) => c.classList.toggle('lit', x[i] > 0.05));
   percRefs.w.forEach((t, i) => { t.textContent = p ? `w=${p.weights[i]}` : ''; });
   percRefs.edges.forEach((e, i) => e.classList.toggle('neg', !!p && p.weights[i] < 0));
@@ -1329,7 +1336,7 @@ function renderMetrics(m) {
 
   $('#cm-mlp').append(confusion(m.mlp_confusion, ANN_OUT));
   $('#cm-perc').append(confusion(m.perceptron_confusion, ['not urgent', 'urgent']));
-  drawLoss(m.loss_curve);
+  drawLoss(m.loss_curve, m.loss_epochs);
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $$('#acc-bars [data-w]').forEach((i) => { i.style.width = i.dataset.w; });
   }));
@@ -1355,7 +1362,7 @@ function confusion(mat, labels) {
   io.observe(grid);
   return wrap;
 }
-function drawLoss(loss) {
+function drawLoss(loss, epochs) {
   const svg = $('#loss-curve'); svg.innerHTML = '';
   const W = 360; const H = 200; const L = 40; const R = 10; const T = 12; const B = 30;
   const max = Math.ceil(Math.max(...loss) * 10) / 10; const min = 0;
@@ -1366,7 +1373,7 @@ function drawLoss(loss) {
     s('line', { class: 'grid-line', x1: L, x2: W - R, y1: y(v), y2: y(v) }, svg);
     s('text', { class: 'axis-text', x: L - 6, y: y(v) + 3.5, 'text-anchor': 'end', text: v.toFixed(1) }, svg);
   }
-  [0, Math.floor((loss.length - 1) / 2), loss.length - 1].forEach((i) => s('text', { class: 'axis-text', x: x(i), y: H - 12, 'text-anchor': 'middle', text: i + 1 }, svg));
+  [0, Math.floor((loss.length - 1) / 2), loss.length - 1].forEach((i) => s('text', { class: 'axis-text', x: x(i), y: H - 12, 'text-anchor': i === loss.length - 1 ? 'end' : 'middle', text: epochs ? epochs[i] : i + 1 }, svg));
   s('text', { class: 'axis-text', x: (L + W - R) / 2, y: H - 1, 'text-anchor': 'middle', text: 'epoch' }, svg);
   const pts = loss.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   s('polygon', { class: 'loss-area', points: `${x(0)},${y(min)} ${pts} ${x(loss.length - 1)},${y(min)}` }, svg);

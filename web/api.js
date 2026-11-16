@@ -7,7 +7,7 @@
    ========================================================================== */
 'use strict';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 const API_BASE = '/api';
 
 async function http(method, path, body) {
@@ -38,6 +38,8 @@ const API = {
   annPredict: (body) => USE_MOCK ? mockCall(() => Mock.predict(body.features)) : http('POST', '/ann/predict', body),
   annMetrics: () => USE_MOCK ? mockCall(() => Mock.metrics()) : http('GET', '/ann/metrics'),
   reset: () => USE_MOCK ? mockCall(() => Mock.reset()) : http('POST', '/reset', {}),
+  // Bookings only (request ids keep counting): run before every demo scenario, like cli.py's demo mode.
+  resetBookings: () => USE_MOCK ? mockCall(() => Mock.resetBookings()) : http('POST', '/reset', { keep_counter: true }),
   mode: () => (USE_MOCK ? 'mock' : 'live'),
 };
 
@@ -714,5 +716,6 @@ const Mock = (() => {
     kb: () => ({ facts: FACT_TEXT, rules: RULES.map(({ id, text, source }) => ({ id, text, source })) }),
     query, forward, predict, metrics, processRequest,
     reset: () => { bookingsState = BASE_BOOKINGS.map((x) => ({ ...x })); reqCounter = 0; return { ok: true }; },
+    resetBookings: () => { bookingsState = BASE_BOOKINGS.map((x) => ({ ...x })); return { ok: true }; },
   };
 })();
