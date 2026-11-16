@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Campus AI — Decision Support and Automation System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><circle cx="8" cy="9" r="3"/><circle cx="24" cy="9" r="3"/><circle cx="16" cy="23" r="3"/><path d="M10.5 10.5l4 10M21.5 10.5l-4 10M11 9h10"/></svg>
+      </span>
+      <div>
+        <div class="brand-name">Smart Campus AI</div>
+        <div class="brand-sub">AL2002 · AI Lab project</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Sections">
+      <button class="nav-item active" data-section="console" style="--mod: var(--core)"><span class="ico" data-icon="console"></span><span>Request console</span></button>
+      <button class="nav-item" data-section="map" style="--mod: var(--search)"><span class="ico" data-icon="search"></span><span>Campus map &amp; search</span><span class="nav-dot"></span></button>
+      <button class="nav-item" data-section="csp" style="--mod: var(--csp)"><span class="ico" data-icon="csp"></span><span>Scheduling / CSP</span><span class="nav-dot"></span></button>
+      <button class="nav-item" data-section="kb" style="--mod: var(--logic)"><span class="ico" data-icon="logic"></span><span>Knowledge base</span><span class="nav-dot"></span></button>
+      <button class="nav-item" data-section="ann" style="--mod: var(--ann)"><span class="ico" data-icon="ann"></span><span>ANN priority</span><span class="nav-dot"></span></button>
+      <button class="nav-item" data-section="history" style="--mod: var(--core)"><span class="ico" data-icon="history"></span><span>History</span><span class="nav-count" id="nav-count">0</span></button>
+    </nav>
+
+    <div class="legend-box">
+      <div class="legend-title">AI modules</div>
+      <ul class="mod-legend">
+        <li><span class="swatch" style="--c: var(--search)"></span>Search <small>Student 1</small></li>
+        <li><span class="swatch" style="--c: var(--logic)"></span>Logic / KB <small>Student 2</small></li>
+        <li><span class="swatch" style="--c: var(--csp)"></span>CSP <small>Student 2</small></li>
+        <li><span class="swatch" style="--c: var(--ann)"></span>ANN <small>Student 3</small></li>
+      </ul>
+    </div>
+    <div class="api-mode" id="api-mode"><span class="pulse-dot"></span><span id="api-mode-text">Mock data</span></div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="title-block">
+        <h1>Smart Campus AI</h1>
+        <p>Decision Support and Automation System</p>
+      </div>
+      <div class="top-actions">
+        <button class="counter" id="history-counter" type="button" aria-label="Open request history">
+          <span class="ico" data-icon="history"></span>
+          <span><strong id="hist-count">0</strong> requests processed</span>
+        </button>
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to light theme">
+          <span class="ico theme-moon" data-icon="moon"></span><span class="ico theme-sun" data-icon="sun"></span>
+        </button>
+        <button class="btn danger-ghost" id="reset-btn" type="button"><span class="ico" data-icon="reset"></span>Reset system</button>
+      </div>
+    </header>
+
+    <main id="content" tabindex="-1">
+
+      <!-- ============ 1. REQUEST CONSOLE ============ -->
+      <section class="section active" id="sec-console" aria-labelledby="h-console">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Home</span>
+            <h2 id="h-console">Request console</h2>
+            <p>Submit a structured campus request. The router decides which AI modules handle it, and the tracker shows the request moving through each one.</p>
+          </div>
+          <label class="demo-picker">
+            <span>Demo scenarios</span>
+            <select id="demo-select"><option value="">Choose a scenario to run…</option></select>
+          </label>
+        </div>
+
+        <!-- Pipeline tracker -->
+        <section class="card pipeline-card" aria-labelledby="h-pipe">
+          <div class="card-head">
+            <h3 id="h-pipe">Pipeline tracker</h3>
+            <p class="pipe-meta" id="pipe-meta">Submit a request to watch it move through the modules the router selects.</p>
+            <button class="btn ghost sm" id="pipe-replay" type="button" disabled><span class="ico" data-icon="replay"></span>Replay</button>
+          </div>
+          <div class="pipeline" id="pipeline">
+            <div class="pipe-track"><div class="pipe-fill"></div></div>
+            <div class="pipe-token" aria-hidden="true"></div>
+            <ol class="pipe-nodes"></ol>
+          </div>
+          <div class="pipe-callout" id="pipe-callout" hidden></div>
+        </section>
+
+        <div class="console-grid">
+          <!-- Request form -->
+          <form class="card form-card" id="req-form" novalidate>
+            <div class="card-head"><h3>New request</h3></div>
+            <div class="row-2">
+              <div class="field">
+                <label for="f-name">Name</label>
+                <input id="f-name" name="name" type="text" placeholder="e.g. Ali" autocomplete="off" required>
+              </div>
+              <div class="field">
+                <label for="f-role">Role</label>
+                <select id="f-role" name="role">
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+            </div>
+
+            <fieldset class="type-picker">
+              <legend>Request type</legend>
+              <div class="type-grid" id="type-grid"></div>
+            </fieldset>
+
+            <div class="dyn-fields">
+              <div class="dyn" data-show="Navigation_Only Booking_or_Scheduling Urgent_Service_Request Full_Service_Request" data-optional="Booking_or_Scheduling"><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-loc">Current location <span class="opt">(optional)</span></label>
+                  <select id="f-loc" name="current_location" data-locations></select>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Navigation_Only"><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-dest">Destination</label>
+                  <select id="f-dest" name="destination" data-locations></select>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Eligibility_Check"><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-query">FOL query</label>
+                  <input id="f-query" name="query" type="text" class="mono" placeholder="UsesLab(DrKhan, Lab1)" autocomplete="off" spellcheck="false">
+                  <div class="chips" data-query-chips="f-query"></div>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Booking_or_Scheduling Urgent_Service_Request Full_Service_Request"><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-cat">Category</label>
+                  <select id="f-cat" name="category" data-categories></select>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Booking_or_Scheduling" data-viva-only><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-group">Viva group</label>
+                  <select id="f-group" name="group_id">
+                    <option>G1</option><option>G2</option><option>G3</option><option selected>G4</option><option>G5</option><option>G6</option>
+                  </select>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Booking_or_Scheduling Urgent_Service_Request Full_Service_Request" data-optional="Urgent_Service_Request"><div class="dyn-inner">
+                <fieldset class="field">
+                  <legend>Preferred slot <span class="opt">(optional)</span></legend>
+                  <div class="seg slot-seg">
+                    <label class="seg-opt only-optional"><input type="radio" name="preferred_slot" value=""><span>None</span></label>
+                    <label class="seg-opt"><input type="radio" name="preferred_slot" value="1"><span><b>1</b> 09:00</span></label>
+                    <label class="seg-opt"><input type="radio" name="preferred_slot" value="2" checked><span><b>2</b> 10:30</span></label>
+                    <label class="seg-opt"><input type="radio" name="preferred_slot" value="3"><span><b>3</b> 13:00</span></label>
+                    <label class="seg-opt"><input type="radio" name="preferred_slot" value="4"><span><b>4</b> 14:30</span></label>
+                  </div>
+                </fieldset>
+              </div></div>
+
+              <div class="dyn" data-show="Urgent_Service_Request Full_Service_Request"><div class="dyn-inner">
+                <div class="sliders">
+                  <div class="field slider-field">
+                    <label for="f-sev">Severity <output for="f-sev">8</output></label>
+                    <input id="f-sev" name="severity" type="range" min="1" max="10" value="8">
+                  </div>
+                  <div class="field slider-field">
+                    <label for="f-time">Time sensitivity <output for="f-time">9</output></label>
+                    <input id="f-time" name="time_sensitivity" type="range" min="1" max="10" value="9">
+                  </div>
+                  <div class="field slider-field">
+                    <label for="f-crowd">Crowd level <output for="f-crowd">5</output></label>
+                    <input id="f-crowd" name="crowd_level" type="range" min="1" max="10" value="5">
+                  </div>
+                </div>
+              </div></div>
+
+              <div class="dyn" data-show="Urgent_Service_Request Full_Service_Request"><div class="dyn-inner">
+                <label class="check">
+                  <input type="checkbox" name="eligibility" id="f-elig" checked>
+                  <span class="check-box" aria-hidden="true"></span>
+                  <span>I meet the eligibility requirements for this service</span>
+                </label>
+              </div></div>
+
+              <div class="dyn" data-show="Full_Service_Request"><div class="dyn-inner">
+                <div class="field">
+                  <label for="f-note">Description note <span class="opt is-on">(optional)</span></label>
+                  <textarea id="f-note" name="description_note" rows="2" placeholder="Anything the service team should know"></textarea>
+                </div>
+              </div></div>
+            </div>
+
+            <div class="form-foot">
+              <button class="btn primary" type="submit" id="submit-btn"><span class="ico" data-icon="play"></span>Run through pipeline</button>
+              <button class="btn ghost" type="button" id="clear-btn">Clear</button>
+            </div>
+          </form>
+
+          <!-- Result panel -->
+          <section class="result-panel" id="result" aria-live="polite" aria-labelledby="h-result">
+            <h3 class="visually-hidden" id="h-result">Result</h3>
+            <div class="empty-state">
+              <span class="ico big" data-icon="final"></span>
+              <p><strong>No result yet.</strong> Pick a demo scenario or fill the form to see the decision, priority, eligibility, assignment and route.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============ 2. CAMPUS MAP & SEARCH ============ -->
+      <section class="section" id="sec-map" data-mod="search" aria-labelledby="h-map" hidden>
+        <div class="section-head">
+          <div>
+            <span class="kicker mod-search">Search · Student 1</span>
+            <h2 id="h-map">Campus map &amp; search</h2>
+            <p>Pick a source and destination on the map or from the lists. Nodes light up in the order the algorithm expands them, then the final path is drawn.</p>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <div class="card map-card">
+            <div class="map-toolbar">
+              <div class="field inline">
+                <label for="m-src">From</label>
+                <select id="m-src" data-locations></select>
+              </div>
+              <button class="icon-btn sm" id="m-swap" type="button" aria-label="Swap source and destination"><span class="ico" data-icon="swap"></span></button>
+              <div class="field inline">
+                <label for="m-dst">To</label>
+                <select id="m-dst" data-locations></select>
+              </div>
+              <div class="seg mode-seg" role="radiogroup" aria-label="Graph mode">
+                <label class="seg-opt"><input type="radio" name="graph-mode" value="unweighted"><span>Unweighted</span></label>
+                <label class="seg-opt"><input type="radio" name="graph-mode" value="weighted-h" checked><span>Weighted + h(n)</span></label>
+                <label class="seg-opt"><input type="radio" name="graph-mode" value="weighted"><span>Weighted, no h</span></label>
+              </div>
+              <div class="field inline">
+                <label for="m-speed">Speed</label>
+                <select id="m-speed"><option value="1.8">Slow</option><option value="1" selected>Normal</option><option value="0.45">Fast</option></select>
+              </div>
+              <button class="btn primary" id="m-run" type="button"><span class="ico" data-icon="play"></span>Run search</button>
+            </div>
+            <div class="map-hint" id="map-hint">Click a node to set the source, then another to set the destination.</div>
+            <div class="map-wrap">
+              <svg id="campus-map" class="campus-map" role="group" aria-label="Campus map"></svg>
+            </div>
+            <div class="map-legend">
+              <span><i class="lg lg-src"></i>Source</span>
+              <span><i class="lg lg-goal"></i>Goal</span>
+              <span><i class="lg lg-frontier"></i>Frontier</span>
+              <span><i class="lg lg-explored"></i>Explored</span>
+              <span><i class="lg lg-path"></i>Final path</span>
+            </div>
+            <div class="exp-wrap">
+              <span class="exp-label">Expansion order</span>
+              <ol class="exp-strip" id="exp-strip"></ol>
+            </div>
+          </div>
+
+          <aside class="map-side">
+            <div class="card policy-card">
+              <span class="card-label">Policy selects</span>
+              <div class="policy-algo" id="policy-algo">A*</div>
+              <p class="policy-why" id="policy-why">Weighted graph with an admissible heuristic available, so A* finds the cheapest path while expanding fewer nodes.</p>
+              <div class="stat-row">
+                <div class="stat"><span class="stat-v" id="st-cost">–</span><span class="stat-l">Path cost</span></div>
+                <div class="stat"><span class="stat-v" id="st-steps">–</span><span class="stat-l">Steps</span></div>
+                <div class="stat"><span class="stat-v" id="st-exp">–</span><span class="stat-l">Expanded</span></div>
+              </div>
+              <div class="path-text mono" id="st-path"></div>
+            </div>
+            <div class="card info-card">
+              <span class="card-label">Heuristic</span>
+              <div class="formula mono">h(n) = k · euclid(n, goal), k = <span id="k-val">1/3</span></div>
+              <p>Straight-line distance alone would overestimate on this map: Main_Gate–Bus_Stop is 3 units apart but costs only 1. Scaling by k = 1/3, the smallest cost-per-distance ratio of any edge, keeps h(n) at or below the real cost of every edge, so h is admissible and consistent and A* stays optimal.</p>
+              <p class="h-live" id="h-live"></p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="card compare-card">
+          <div class="card-head">
+            <h3>Compare all 9 algorithms</h3>
+            <p class="muted" id="cmp-sub">Same source and destination, weighted graph.</p>
+            <div class="field inline">
+              <label for="dls-limit">DLS limit</label>
+              <input id="dls-limit" type="number" min="1" max="12" value="3">
+            </div>
+            <button class="btn primary" id="cmp-run" type="button"><span class="ico" data-icon="compare"></span>Compare</button>
+          </div>
+          <div id="cmp-body" class="cmp-body">
+            <p class="muted empty-line">Run a comparison to see every algorithm on the current source and destination. Click a row to replay its animation on the map.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 3. SCHEDULING / CSP ============ -->
+      <section class="section" id="sec-csp" data-mod="csp" aria-labelledby="h-csp" hidden>
+        <div class="section-head">
+          <div>
+            <span class="kicker mod-csp">CSP · Student 2</span>
+            <h2 id="h-csp">Scheduling / CSP</h2>
+            <p>Rooms × time slots with hard constraints: no double booking, and each priority must be served before its deadline slot.</p>
+          </div>
+        </div>
+
+        <div class="card booking-card">
+          <div class="card-head">
+            <h3>Room bookings</h3>
+            <ul class="deadline-legend" aria-label="Priority deadlines">
+              <li><span class="pchip p-urgent">Urgent</span> ≤ slot 2</li>
+              <li><span class="pchip p-high">High</span> ≤ slot 3</li>
+              <li><span class="pchip p-normal">Normal / Low</span> ≤ slot 4</li>
+            </ul>
+          </div>
+          <div class="booking-wrap">
+            <div class="booking-grid" id="booking-grid"></div>
+            <div class="booking-token" id="booking-token" hidden></div>
+          </div>
+          <div class="csp-note" id="csp-note" hidden></div>
+          <form class="try-booking" id="try-booking">
+            <span class="card-label">Try a booking</span>
+            <div class="field inline">
+              <label for="tb-cat">Category</label>
+              <select id="tb-cat"></select>
+            </div>
+            <div class="field inline">
+              <label for="tb-slot">Preferred slot</label>
+              <select id="tb-slot"><option value="1">1 · 09:00</option><option value="2" selected>2 · 10:30</option><option value="3">3 · 13:00</option><option value="4">4 · 14:30</option></select>
+            </div>
+            <button class="btn csp" type="submit"><span class="ico" data-icon="csp"></span>Book through pipeline</button>
+          </form>
+        </div>
+
+        <div class="card viva-card">
+          <div class="card-head">
+            <h3>Viva timetable: backtracking search</h3>
+            <p class="muted">Variables G1–G6, domain slots 1–4. Linked groups cannot share a slot; G4 must come before G3. Variable order: MRV, then degree.</p>
+            <button class="btn csp" id="viva-solve" type="button"><span class="ico" data-icon="play"></span>Solve timetable</button>
+          </div>
+          <div class="viva-layout">
+            <div class="viva-graph-wrap">
+              <svg id="viva-graph" class="viva-graph" viewBox="0 0 540 380" role="img" aria-label="Viva constraint graph"></svg>
+              <div class="viva-legend">
+                <span><i class="vl vl-exam"></i>Examiner clash</span>
+                <span><i class="vl vl-sup"></i>Supervisor clash</span>
+                <span><i class="vl vl-other"></i>Other clash</span>
+                <span><i class="vl vl-prec"></i>Precedence (before)</span>
+              </div>
+            </div>
+            <div class="viva-side">
+              <div class="slot-key" id="slot-key"></div>
+              <div class="stat-row">
+                <div class="stat"><span class="stat-v" id="viva-tried">–</span><span class="stat-l">Assignments tried</span></div>
+                <div class="stat"><span class="stat-v" id="viva-bt">–</span><span class="stat-l">Backtracks</span></div>
+              </div>
+              <span class="card-label">Search log</span>
+              <ol class="viva-log" id="viva-log"></ol>
+              <div id="viva-table"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 4. KNOWLEDGE BASE ============ -->
+      <section class="section" id="sec-kb" data-mod="logic" aria-labelledby="h-kb" hidden>
+        <div class="section-head">
+          <div>
+            <span class="kicker mod-logic">Logic / KB · Student 2</span>
+            <h2 id="h-kb">Knowledge base &amp; logic</h2>
+            <p>First-order facts and Horn rules. Queries are answered by backward chaining; the proof chain shows which facts and rules support the conclusion.</p>
+          </div>
+        </div>
+        <div class="kb-layout">
+          <div class="card kb-lists">
+            <div class="kb-block">
+              <div class="card-head"><h3>Facts</h3><span class="count-pill" id="fact-count">0</span></div>
+              <ul class="fact-list" id="fact-list"></ul>
+            </div>
+            <div class="kb-block">
+              <div class="card-head"><h3>Rules</h3><span class="count-pill" id="rule-count">0</span></div>
+              <ul class="rule-list" id="rule-list"></ul>
+            </div>
+          </div>
+          <div class="kb-main">
+            <form class="card query-card" id="kb-form">
+              <div class="card-head"><h3>Ask the knowledge base</h3></div>
+              <div class="query-row">
+                <label class="visually-hidden" for="kb-query">FOL query</label>
+                <input id="kb-query" class="mono" type="text" value="UsesLab(DrKhan, Lab1)" spellcheck="false" autocomplete="off">
+                <button class="btn logic" type="submit"><span class="ico" data-icon="logic"></span>Prove</button>
+              </div>
+              <div class="chips" data-query-chips="kb-query" data-autorun></div>
+              <div class="verdict" id="kb-verdict" hidden></div>
+              <div class="proof" id="kb-proof"></div>
+            </form>
+            <div class="card forward-card">
+              <div class="card-head">
+                <h3>Forward chaining</h3>
+                <p class="muted">Fire every rule whose premises are satisfied until nothing new can be derived.</p>
+                <button class="btn logic" id="kb-forward" type="button"><span class="ico" data-icon="play"></span>Run forward chaining</button>
+              </div>
+              <ol class="forward-log" id="forward-log"></ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 5. ANN PRIORITY ============ -->
+      <section class="section" id="sec-ann" data-mod="ann" aria-labelledby="h-ann" hidden>
+        <div class="section-head">
+          <div>
+            <span class="kicker mod-ann">ANN · Student 3</span>
+            <h2 id="h-ann">ANN priority</h2>
+            <p>A 7 → 4 → 3 → 4 multilayer perceptron predicts the final priority; a single perceptron gives the binary urgent / not-urgent signal.</p>
+          </div>
+        </div>
+        <div class="ann-layout">
+          <div class="card ann-net-card">
+            <div class="card-head"><h3>MLP: 7 → 4 → 3 → 4</h3><p class="muted">Neuron brightness = activation.</p></div>
+            <svg id="ann-net" class="ann-net" viewBox="0 0 760 420" role="img" aria-label="Neural network diagram"></svg>
+            <div class="prob-bars" id="prob-bars"></div>
+          </div>
+          <form class="card ann-controls" id="ann-form">
+            <div class="card-head"><h3>Input features</h3></div>
+            <div class="field">
+              <label for="a-role">Role</label>
+              <select id="a-role"><option value="0">Student</option><option value="1">Instructor</option><option value="2">Staff</option></select>
+            </div>
+            <div class="field">
+              <label for="a-type">Request type</label>
+              <select id="a-type">
+                <option value="0">Navigation only</option><option value="1">Eligibility check</option>
+                <option value="2">Booking / scheduling</option><option value="3">Urgent service</option>
+                <option value="4" selected>Full service</option>
+              </select>
+            </div>
+            <div class="field slider-field"><label for="a-sev">Severity <output for="a-sev">8</output></label><input id="a-sev" type="range" min="1" max="10" value="8"></div>
+            <div class="field slider-field"><label for="a-time">Time sensitivity <output for="a-time">9</output></label><input id="a-time" type="range" min="1" max="10" value="9"></div>
+            <div class="field slider-field"><label for="a-crowd">Crowd level <output for="a-crowd">5</output></label><input id="a-crowd" type="range" min="1" max="10" value="5"></div>
+            <div class="field slider-field"><label for="a-dist">Distance (route cost) <output for="a-dist">6</output></label><input id="a-dist" type="range" min="0" max="20" value="6"></div>
+            <label class="check">
+              <input type="checkbox" id="a-elig" checked><span class="check-box" aria-hidden="true"></span><span>Eligible</span>
+            </label>
+            <button class="btn ann" type="submit"><span class="ico" data-icon="play"></span>Predict</button>
+            <div class="ann-verdict" id="ann-verdict"></div>
+          </form>
+        </div>
+
+        <div class="card perceptron-card">
+          <div class="card-head"><h3>Perceptron: urgent or not</h3><p class="muted">Weighted sum of the 7 inputs plus bias, then a step function.</p></div>
+          <svg id="perceptron" class="perceptron" viewBox="0 0 760 250" role="img" aria-label="Perceptron diagram"></svg>
+        </div>
+
+        <div class="card metrics-card">
+          <div class="card-head"><h3>Model evaluation</h3><p class="muted">Held-out test set of 300 requests.</p></div>
+          <div class="metrics-grid">
+            <div class="metric-block">
+              <span class="card-label">Accuracy</span>
+              <div id="acc-bars" class="acc-bars"></div>
+            </div>
+            <div class="metric-block">
+              <span class="card-label">MLP confusion matrix (4 classes)</span>
+              <div id="cm-mlp"></div>
+            </div>
+            <div class="metric-block">
+              <span class="card-label">Perceptron confusion matrix</span>
+              <div id="cm-perc"></div>
+            </div>
+            <div class="metric-block">
+              <span class="card-label">Training loss</span>
+              <svg id="loss-curve" class="loss-curve" viewBox="0 0 360 200" role="img" aria-label="Training loss curve"></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 6. HISTORY ============ -->
+      <section class="section" id="sec-history" aria-labelledby="h-history" hidden>
+        <div class="section-head">
+          <div>
+            <span class="kicker">Session</span>
+            <h2 id="h-history">History</h2>
+            <p>Every processed request in this session. Open one to see its result again and replay its pipeline.</p>
+          </div>
+        </div>
+        <div class="card">
+          <ol class="timeline" id="timeline"></ol>
+          <p class="muted empty-line" id="timeline-empty">No requests yet. Submit one from the Request console.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
