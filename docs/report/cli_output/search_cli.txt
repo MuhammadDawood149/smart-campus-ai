@@ -1,0 +1,49 @@
+$ python student1_search/search_cli.py
+
+=== Campus Search (mode: A*) ===
+1. Find route
+2. Change graph mode (BFS / A* / UCS)
+3. Compare all 9 algorithms
+4. Show map + heuristic table
+5. Exit
+Choose 1-5: 1
+From (blank = back): Hostel
+To (blank = back): AI_Lab
+  Algorithm      : A*
+  Path           : Hostel -> Cafeteria -> Science_Block -> AI_Lab
+  Cost           : 6
+  Steps          : 3
+  Nodes expanded : 6
+
+=== Campus Search (mode: A*) ===
+1. Find route
+2. Change graph mode (BFS / A* / UCS)
+3. Compare all 9 algorithms
+4. Show map + heuristic table
+5. Exit
+Choose 1-5: 3
+From (blank = back): Hostel
+To (blank = back): AI_Lab
+DLS depth limit [5]: 
+
+Comparison: Hostel -> AI_Lab   (weighted graph, DLS limit 5)
+Algorithm          Found  Cost Steps  Expanded       ms  Path
+-------------------------------------------------------------------------------------------
+BFS                yes       7     3        10    0.029  Hostel -> Cafeteria -> Library -> AI_Lab
+UCS                yes       6     3         9    0.029  Hostel -> Cafeteria -> Science_Block -> AI_Lab
+A*                 yes       6     3         6    0.023  Hostel -> Cafeteria -> Science_Block -> AI_Lab
+DFS                yes       7     3         4    0.014  Hostel -> Cafeteria -> Library -> AI_Lab
+DLS                yes       7     3         4    0.014  Hostel -> Cafeteria -> Library -> AI_Lab
+IDS                yes       7     3        19    0.020  Hostel -> Cafeteria -> Library -> AI_Lab
+Bidirectional BFS  yes       7     3         4    0.020  Hostel -> Cafeteria -> Library -> AI_Lab
+Greedy Best-First  yes       6     3         4    0.023  Hostel -> Cafeteria -> Science_Block -> AI_Lab
+RBFS               yes       6     3         8    0.047  Hostel -> Cafeteria -> Science_Block -> AI_Lab
+
+=== Campus Search (mode: A*) ===
+1. Find route
+2. Change graph mode (BFS / A* / UCS)
+3. Compare all 9 algorithms
+4. Show map + heuristic table
+5. Exit
+Choose 1-5: 5
+Goodbye.

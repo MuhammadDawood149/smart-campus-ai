@@ -1,0 +1,693 @@
+{
+ "date": "2026-11-18T02:14:51",
+ "browser": "msedge",
+ "viewport": "1366x768",
+ "passed": 114,
+ "total": 114,
+ "results": [
+  {
+   "area": "Setup",
+   "check": "UI loads in live mode (USE_MOCK = false)",
+   "pass": true,
+   "notes": "Live API"
+  },
+  {
+   "area": "Setup",
+   "check": "no JS errors / failed requests (first load)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Console",
+   "check": "demo list has 9 scenarios",
+   "pass": true,
+   "notes": "9"
+  },
+  {
+   "area": "Console",
+   "check": "demo 1 run 1: Navigation_Only: Hostel -> AI_Lab (handout Phase 3 section 9",
+   "pass": true,
+   "notes": "REQ101 completed cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "demo 2 run 1: Eligibility_Check: UsesLab(DrKhan, Lab1) (handout Phase 3 se",
+   "pass": true,
+   "notes": "REQ102 answered"
+  },
+  {
+   "area": "Console",
+   "check": "demo 3 run 1: Booking_or_Scheduling: Ali, AI_Lab_Support, preferred slot 2",
+   "pass": true,
+   "notes": "REQ103 accepted AI_Lab s3 cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "demo 4 run 1: Booking_or_Scheduling: Ahmed schedules the viva for group G4",
+   "pass": true,
+   "notes": "REQ104 accepted Exam_Hall s2"
+  },
+  {
+   "area": "Console",
+   "check": "demo 5 run 1: Urgent_Service_Request: Bilal (staff), Emergency_Help from B",
+   "pass": true,
+   "notes": "REQ105 accepted Medical_Center s1 cost 2"
+  },
+  {
+   "area": "Console",
+   "check": "demo 6 run 1: Full_Service_Request: the handout example (Phase 3 section 1",
+   "pass": true,
+   "notes": "REQ106 accepted AI_Lab s3 cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "handout full-service example (run 1): high/urgent, AI_Lab s3, cost 6",
+   "pass": true,
+   "notes": "confidence 0.59"
+  },
+  {
+   "area": "Console",
+   "check": "demo 7 run 1: Rejected at Logic: Sara asks for AI_Lab_Support (no Programm",
+   "pass": true,
+   "notes": "REQ107 rejected at logic"
+  },
+  {
+   "area": "Console",
+   "check": "demo 8 run 1: Rejected at Logic: Ali tries to schedule G4's viva (Ali is i",
+   "pass": true,
+   "notes": "REQ108 rejected at logic"
+  },
+  {
+   "area": "Console",
+   "check": "demo 9 run 1: Rejected at preprocessing: unknown location Sports_Complex",
+   "pass": true,
+   "notes": "REQ109 rejected at preprocessing"
+  },
+  {
+   "area": "Console",
+   "check": "demo 1 run 2: Navigation_Only: Hostel -> AI_Lab (handout Phase 3 section 9",
+   "pass": true,
+   "notes": "REQ110 completed cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "demo 2 run 2: Eligibility_Check: UsesLab(DrKhan, Lab1) (handout Phase 3 se",
+   "pass": true,
+   "notes": "REQ111 answered"
+  },
+  {
+   "area": "Console",
+   "check": "demo 3 run 2: Booking_or_Scheduling: Ali, AI_Lab_Support, preferred slot 2",
+   "pass": true,
+   "notes": "REQ112 accepted AI_Lab s3 cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "demo 4 run 2: Booking_or_Scheduling: Ahmed schedules the viva for group G4",
+   "pass": true,
+   "notes": "REQ113 accepted Exam_Hall s2"
+  },
+  {
+   "area": "Console",
+   "check": "demo 5 run 2: Urgent_Service_Request: Bilal (staff), Emergency_Help from B",
+   "pass": true,
+   "notes": "REQ114 accepted Medical_Center s1 cost 2"
+  },
+  {
+   "area": "Console",
+   "check": "demo 6 run 2: Full_Service_Request: the handout example (Phase 3 section 1",
+   "pass": true,
+   "notes": "REQ115 accepted AI_Lab s3 cost 6"
+  },
+  {
+   "area": "Console",
+   "check": "handout full-service example (run 2): high/urgent, AI_Lab s3, cost 6",
+   "pass": true,
+   "notes": "confidence 0.59"
+  },
+  {
+   "area": "Console",
+   "check": "demo 7 run 2: Rejected at Logic: Sara asks for AI_Lab_Support (no Programm",
+   "pass": true,
+   "notes": "REQ116 rejected at logic"
+  },
+  {
+   "area": "Console",
+   "check": "demo 8 run 2: Rejected at Logic: Ali tries to schedule G4's viva (Ali is i",
+   "pass": true,
+   "notes": "REQ117 rejected at logic"
+  },
+  {
+   "area": "Console",
+   "check": "demo 9 run 2: Rejected at preprocessing: unknown location Sports_Complex",
+   "pass": true,
+   "notes": "REQ118 rejected at preprocessing"
+  },
+  {
+   "area": "Console",
+   "check": "no JS errors / failed requests (demo scenarios)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Console",
+   "check": "Clear resets every field (incl. role) to its default",
+   "pass": true,
+   "notes": "['', 'student', 'Navigation_Only', '', 'AI_Lab_Support', '2', '8', '9', '5', True, '']"
+  },
+  {
+   "area": "Console",
+   "check": "form fields for Navigation_Only = cli.py",
+   "pass": true,
+   "notes": "current_location, destination"
+  },
+  {
+   "area": "Console",
+   "check": "manual Navigation_Only reaches the backend with every field",
+   "pass": true,
+   "notes": "{\"name\": \"Ali\", \"role\": \"student\", \"request_type\": \"Navigation_Only\", \"current_location\": \"Main_Gate\", \"destination\": \"Seminar_Room\"} -> REQ101 completed"
+  },
+  {
+   "area": "Console",
+   "check": "manual Navigation_Only result rendered",
+   "pass": true,
+   "notes": "Completed: Best route generated successfully."
+  },
+  {
+   "area": "Console",
+   "check": "form fields for Eligibility_Check = cli.py",
+   "pass": true,
+   "notes": "query"
+  },
+  {
+   "area": "Console",
+   "check": "manual Eligibility_Check reaches the backend with every field",
+   "pass": true,
+   "notes": "{\"name\": \"DrKhan\", \"role\": \"instructor\", \"request_type\": \"Eligibility_Check\", \"query\": \"CanRequest(Ali, AI_Lab_Support)\"} -> REQ102 answered"
+  },
+  {
+   "area": "Console",
+   "check": "manual Eligibility_Check result rendered",
+   "pass": true,
+   "notes": "Answered: Eligibility query answered successfully."
+  },
+  {
+   "area": "Console",
+   "check": "form fields for Booking_or_Scheduling = cli.py",
+   "pass": true,
+   "notes": "category, current_location, preferred_slot"
+  },
+  {
+   "area": "Console",
+   "check": "manual Booking_or_Scheduling reaches the backend with every field",
+   "pass": true,
+   "notes": "{\"name\": \"Ali\", \"role\": \"student\", \"request_type\": \"Booking_or_Scheduling\", \"current_location\": \"Library\", \"category\": \"Maintenance\", \"preferred_slot\": 3} -> REQ103 accepted"
+  },
+  {
+   "area": "Console",
+   "check": "manual Booking_or_Scheduling result rendered",
+   "pass": true,
+   "notes": "Accepted: Booking assigned successfully."
+  },
+  {
+   "area": "Console",
+   "check": "form fields for Urgent_Service_Request = cli.py",
+   "pass": true,
+   "notes": "category, crowd_level, current_location, description_note, eligibility, preferred_slot, severity, time_sensitivity"
+  },
+  {
+   "area": "Console",
+   "check": "manual Urgent_Service_Request reaches the backend with every field",
+   "pass": true,
+   "notes": "{\"name\": \"Bilal\", \"role\": \"staff\", \"request_type\": \"Urgent_Service_Request\", \"current_location\": \"Hostel\", \"category\": \"Emergency_Help\", \"preferred_slot\": 2, \"severity\": 10, \"time_sensitivity\": 7, \"crowd_level\": 3, \"eligibility\": true, \"description_note\": \"Water leak near the hostel\"} -> REQ104 accepted"
+  },
+  {
+   "area": "Console",
+   "check": "manual Urgent_Service_Request result rendered",
+   "pass": true,
+   "notes": "Accepted: Your request has been accepted. You are assigned Medical_Center in slot 2. Please follow the recommended route."
+  },
+  {
+   "area": "Console",
+   "check": "form fields for Full_Service_Request = cli.py",
+   "pass": true,
+   "notes": "category, crowd_level, current_location, description_note, eligibility, preferred_slot, severity, time_sensitivity"
+  },
+  {
+   "area": "Console",
+   "check": "manual Full_Service_Request reaches the backend with every field",
+   "pass": true,
+   "notes": "{\"name\": \"Ali\", \"role\": \"student\", \"request_type\": \"Full_Service_Request\", \"current_location\": \"Library\", \"category\": \"AI_Lab_Support\", \"preferred_slot\": 4, \"severity\": 5, \"time_sensitivity\": 9, \"crowd_level\": 5, \"eligibility\": true, \"description_note\": \"Projector broken\"} -> REQ105 accepted"
+  },
+  {
+   "area": "Console",
+   "check": "manual Full_Service_Request result rendered",
+   "pass": true,
+   "notes": "Accepted: Your request has been accepted. You are assigned AI_Lab in slot 3. Please follow the recommended route."
+  },
+  {
+   "area": "Console",
+   "check": "group_id field appears only for Viva_Scheduling",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Console",
+   "check": "no JS errors / failed requests (manual form)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Invalid input",
+   "check": "empty name",
+   "pass": true,
+   "notes": "sent {\"name\": \"\", \"role\": \"student\", \"request_type\": \"Navigation_Only\", \"current_location\": \"Hostel\", \"destination\": \"AI_Lab\"} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:name is required"
+  },
+  {
+   "area": "Invalid input",
+   "check": "unknown location (option injected; the dropdown cannot produce it)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Ali\", \"role\": \"student\", \"request_type\": \"Navigation_Only\", \"current_location\": \"Hostel\", \"destination\": \"Sports_Complex\"} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:destination: Unknown location 'Sports_Complex'. Valid locations: Main_Gate, Parking, Admin_Block, Student_Services, Exam_Hall, Seminar_Room, Library, AI_Lab, Bus_Stop, Medical_Center, Cafeter"
+  },
+  {
+   "area": "Invalid input",
+   "check": "slot outside 1-4 (radio value forced to 7)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Ali\", \"role\": \"student\", \"request_type\": \"Booking_or_Scheduling\", \"category\": \"AI_Lab_Support\", \"preferred_slot\": 7} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:preferred_slot must be 1-4, got 7"
+  },
+  {
+   "area": "Invalid input",
+   "check": "severity 0 (slider limits removed)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Bilal\", \"role\": \"staff\", \"request_type\": \"Urgent_Service_Request\", \"current_location\": \"Bus_Stop\", \"category\": \"Emergency_Help\", \"preferred_slot\": 2, \"severity\": 0, \"time_sensitivity\": 9, \"crowd_level\": 5, \"eligibility\": true} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:severity must be an integer 1-10, got 0"
+  },
+  {
+   "area": "Invalid input",
+   "check": "severity 11 (slider limits removed)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Bilal\", \"role\": \"staff\", \"request_type\": \"Urgent_Service_Request\", \"current_location\": \"Bus_Stop\", \"category\": \"Emergency_Help\", \"preferred_slot\": 2, \"severity\": 11, \"time_sensitivity\": 9, \"crowd_level\": 5, \"eligibility\": true} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:severity must be an integer 1-10, got 11"
+  },
+  {
+   "area": "Invalid input",
+   "check": "malformed FOL query \"UsesLab(DrKhan\"",
+   "pass": true,
+   "notes": "sent {\"name\": \"DrKhan\", \"role\": \"student\", \"request_type\": \"Eligibility_Check\", \"query\": \"UsesLab(DrKhan\"} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:query is invalid: Malformed query 'UsesLab(DrKhan': missing closing parenthesis ')'."
+  },
+  {
+   "area": "Invalid input",
+   "check": "viva without group_id (select emptied)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Ahmed\", \"role\": \"student\", \"request_type\": \"Booking_or_Scheduling\", \"category\": \"Viva_Scheduling\", \"preferred_slot\": 2} -> UI: Rejected | Stopped at preprocessing | Rejected at Preprocessing:group_id is required for Viva_Scheduling (e.g. G4)"
+  },
+  {
+   "area": "Invalid input",
+   "check": "lowercase \"ali\" (normalised -> accepted)",
+   "pass": true,
+   "notes": "sent {\"name\": \"ali\", \"role\": \"student\", \"request_type\": \"Full_Service_Request\", \"current_location\": \"Hostel\", \"category\": \"AI_Lab_Support\", \"preferred_slot\": 2, \"severity\": 8, \"time_sensitivity\": 9, \"crowd_level\": 5, \"eligibility\": true} -> UI: Accepted | CSP note:Preferred slot 2 was unavailable. Slot 1 is the next feasible conflict-free assignment."
+  },
+  {
+   "area": "Invalid input",
+   "check": "lowercase \"g4\" (normalised -> accepted)",
+   "pass": true,
+   "notes": "sent {\"name\": \"Ahmed\", \"role\": \"student\", \"request_type\": \"Booking_or_Scheduling\", \"category\": \"Viva_Scheduling\", \"group_id\": \"g4\", \"preferred_slot\": 2} -> UI: Accepted | CSP note:Preferred slot 2 was available and conflict-free. Viva timetable solved for G1-G6 (no clashes, G4 before G3): G1=1, G2=3, G3=3, G4=2, G5=1, G6=2. G4 gets slot 2 in Exam_Hall."
+  },
+  {
+   "area": "Invalid input",
+   "check": "no JS errors / failed requests (invalid-input submissions)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Console",
+   "check": "AI_Lab slot 2 booked 4x = CSP rules (3 -> 4 -> 1 -> rejected@csp)",
+   "pass": true,
+   "notes": "3 -> 4 -> 1 -> rejected@csp"
+  },
+  {
+   "area": "Console",
+   "check": "4th booking: rejection shown with the reason",
+   "pass": true,
+   "notes": "Rejected at CSP:No conflict-free slot for AI_Lab_Support at or before slot 4 (no priority given). AI_Lab is already booked at slot(s) 1, 2, 3, 4."
+  },
+  {
+   "area": "CSP",
+   "check": "booking grid = backend bookings after requests",
+   "pass": true,
+   "notes": "AI_Lab:1 AI_Lab:2 AI_Lab:3 AI_Lab:4 Admin_Block:1 Exam_Hall:1"
+  },
+  {
+   "area": "CSP",
+   "check": "grid shows which request made each booking",
+   "pass": true,
+   "notes": "REQ103 Booked REQ101 REQ102 Booked Booked"
+  },
+  {
+   "area": "CSP",
+   "check": "quick booking (DrKhan, Maintenance s2) animates and grid = backend",
+   "pass": true,
+   "notes": "REQ105 {'room': 'Student_Services', 'slot': 2, 'preferred_slot': 2, 'priority': None, 'deadline': 4, 'notes': 'Preferred slot 2 was available and conflict-free.'}"
+  },
+  {
+   "area": "CSP",
+   "check": "Reset restores the initial bookings (grid and backend)",
+   "pass": true,
+   "notes": "AI_Lab:2 Admin_Block:1 Exam_Hall:1"
+  },
+  {
+   "area": "Top bar",
+   "check": "Reset clears the history (UI counter and GET /api/history)",
+   "pass": true,
+   "notes": "0"
+  },
+  {
+   "area": "CSP",
+   "check": "no JS errors / failed requests (bookings)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Map & search",
+   "check": "map has 13 nodes",
+   "pass": true,
+   "notes": "13 nodes"
+  },
+  {
+   "area": "Map & search",
+   "check": "map has 19 edges",
+   "pass": true,
+   "notes": "19 lines"
+  },
+  {
+   "area": "Map & search",
+   "check": "no Science_Block-Library edge",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Map & search",
+   "check": "edges and costs = verified diagram data (total 44)",
+   "pass": true,
+   "notes": "total 44"
+  },
+  {
+   "area": "Map & search",
+   "check": "weighted-h Hostel -> AI_Lab = A*, cost 6, 3 steps",
+   "pass": true,
+   "notes": "UI: A* cost 6 steps 3 expanded 6, Hostel \u2192 Cafeteria \u2192 Science Block \u2192 AI Lab"
+  },
+  {
+   "area": "Map & search",
+   "check": "unweighted Hostel -> AI_Lab = BFS, cost 3, 3 steps",
+   "pass": true,
+   "notes": "UI: BFS cost 3 steps 3 expanded 10, Hostel \u2192 Cafeteria \u2192 Library \u2192 AI Lab"
+  },
+  {
+   "area": "Map & search",
+   "check": "weighted Hostel -> AI_Lab = UCS, cost 6, 3 steps",
+   "pass": true,
+   "notes": "UI: UCS cost 6 steps 3 expanded 9, Hostel \u2192 Cafeteria \u2192 Science Block \u2192 AI Lab"
+  },
+  {
+   "area": "Map & search",
+   "check": "clicking map nodes sets source, then destination",
+   "pass": true,
+   "notes": "Main_Gate -> Seminar_Room"
+  },
+  {
+   "area": "Map & search",
+   "check": "compare 9 algorithms Hostel -> AI_Lab = compare_algorithms()",
+   "pass": true,
+   "notes": "BFS:7/10 UCS:6/9 A*:6/6 DFS:7/4 DLS:7/4 IDS:7/19 Bidirectional BFS:7/4 Greedy Best-First:6/4 RBFS:6/8"
+  },
+  {
+   "area": "Map & search",
+   "check": "compare 9 algorithms Main_Gate -> Seminar_Room = compare_algorithms()",
+   "pass": true,
+   "notes": "BFS:7/11 UCS:7/12 A*:7/10 DFS:11/13 DLS:7/5 IDS:7/24 Bidirectional BFS:7/4 Greedy Best-First:7/4 RBFS:7/16"
+  },
+  {
+   "area": "Map & search",
+   "check": "compare 9 algorithms Bus_Stop -> Library = compare_algorithms()",
+   "pass": true,
+   "notes": "BFS:8/13 UCS:8/13 A*:8/11 DFS:14/7 DLS:x/23 IDS:8/46 Bidirectional BFS:8/8 Greedy Best-First:10/5 RBFS:8/37"
+  },
+  {
+   "area": "Map & search",
+   "check": "clicking a compare row replays its expansion (DFS)",
+   "pass": true,
+   "notes": "1 chips mid-animation, 7 at the end, cost 14"
+  },
+  {
+   "area": "Map & search",
+   "check": "no JS errors / failed requests (map & search)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "CSP viva",
+   "check": "timetable shown = /api/viva/solve",
+   "pass": true,
+   "notes": "{\"G1\": 1, \"G2\": 4, \"G3\": 4, \"G4\": 2, \"G5\": 1, \"G6\": 2}"
+  },
+  {
+   "area": "CSP viva",
+   "check": "timetable satisfies every constraint (checked in Python)",
+   "pass": true,
+   "notes": "G4=2 < G3=4"
+  },
+  {
+   "area": "CSP viva",
+   "check": "stats shown (assignments tried / backtracks)",
+   "pass": true,
+   "notes": "tried 6, backtracks 0"
+  },
+  {
+   "area": "CSP viva",
+   "check": "animation played (6 groups assigned, log written)",
+   "pass": true,
+   "notes": "11 log lines for 6 steps"
+  },
+  {
+   "area": "CSP viva",
+   "check": "no JS errors / failed requests (viva)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Knowledge base",
+   "check": "facts and rules R1-R15 listed",
+   "pass": true,
+   "notes": "22 facts, 15 rules"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "query UsesLab(DrKhan, Lab1) = check_logic()",
+   "pass": true,
+   "notes": "Entailed: UsesLab(DrKhan, Lab1)  | proof: Fact: Teaches(DrKhan, AI) > Rule R2: Teaches(x, AI) => Instructor(x, AI) > Derived: Instructor(DrKhan, AI) > Rule R4: Instructor(x, AI) => UsesLab(x, Lab1) > Derived: UsesLab(DrKhan, Lab1)"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "query Eligible(Sara, AI) = check_logic()",
+   "pass": true,
+   "notes": "Not entailed: Eligible(Sara, AI)  | proof: Missing premise: Completed(Sara, ProgrammingFundamentals) > R1 blocked: Student(x) & Completed(x, ProgrammingFundamentals) => Eligible(x, AI)"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "query UsesLab(x, Lab1) = check_logic()",
+   "pass": true,
+   "notes": "Entailed: UsesLab(x, Lab1) ['x = Ali', 'x = Ahmed', 'x = DrKhan'] | proof: Fact: Enrolled(Ali, AI) > Rule R3: Enrolled(x, AI) => UsesLab(x, Lab1) > Derived: UsesLab(Ali, Lab1)"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "query CanRequest(Ali, AI_Lab_Support) = check_logic()",
+   "pass": true,
+   "notes": "Entailed: CanRequest(Ali, AI_Lab_Support)  | proof: Fact: Student(Ali) > Fact: Completed(Ali, ProgrammingFundamentals) > Rule R1: Student(x) & Completed(x, ProgrammingFundamentals) => Eligible(x, AI) > Derived: Eligible(Ali, AI) > Fact: Enrolled(Ali, AI) > Rule R3: Enrolled(x, AI) => UsesLab(x, Lab1) > Derived: UsesLab(Ali, Lab1) > Rule R8: Eligible(x, AI) & UsesLab(x, Lab1) => CanRequest(x, AI_La"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "query CanScheduleViva(Ahmed, G4) = check_logic()",
+   "pass": true,
+   "notes": "Entailed: CanScheduleViva(Ahmed, G4)  | proof: Fact: MemberOf(Ahmed, G4) > Fact: FYPGroup(G4) > Rule R10: MemberOf(x, g) & FYPGroup(g) => CanScheduleViva(x, g) > Derived: CanScheduleViva(Ahmed, G4)"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "malformed query on the KB page gives a clear message",
+   "pass": true,
+   "notes": "Not entailed: UsesLab(DrKhanMalformed query 'UsesLab(DrKhan': missing closing parenthesis ')'."
+  },
+  {
+   "area": "Knowledge base",
+   "check": "forward chaining shows the derived facts = forward_chain()",
+   "pass": true,
+   "notes": "34 derived"
+  },
+  {
+   "area": "Knowledge base",
+   "check": "no JS errors / failed requests (knowledge base)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "ANN",
+   "check": "[0,0,8,9,5,4,1] -> high / urgent, same confidence as predict_priority()",
+   "pass": true,
+   "notes": "UI: high (0.76)MLP final priorityurgentPerceptron binary | Python: {'binary_priority': 'urgent', 'final_priority': 'high', 'confidence': 0.76}"
+  },
+  {
+   "area": "ANN",
+   "check": "network animation lit all 18 neurons; perceptron output shown",
+   "pass": true,
+   "notes": "18 lit"
+  },
+  {
+   "area": "ANN",
+   "check": "metrics: MLP 85.67%, ceiling 87.33%, Perceptron 87.33%",
+   "pass": true,
+   "notes": "MLP (4 classes)85.67%Noise ceiling (4 classes)87.33%MLP collapsed to binary92.67%Perceptron (binary)87.33%60%80%100%The "
+  },
+  {
+   "area": "ANN",
+   "check": "confusion matrices render and = train.evaluate()",
+   "pass": true,
+   "notes": "16 + 4 cells"
+  },
+  {
+   "area": "ANN",
+   "check": "loss curve renders",
+   "pass": true,
+   "notes": "201 points"
+  },
+  {
+   "area": "ANN",
+   "check": "no JS errors / failed requests (ANN)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Reduced motion",
+   "check": "handout full-service demo works",
+   "pass": true,
+   "notes": "media query matches: True"
+  },
+  {
+   "area": "Reduced motion",
+   "check": "map search works",
+   "pass": true,
+   "notes": "Hostel \u2192 Cafeteria \u2192 Science Block \u2192 AI Lab"
+  },
+  {
+   "area": "Reduced motion",
+   "check": "compare + row replay works",
+   "pass": true,
+   "notes": "Hostel \u2192 Cafeteria \u2192 Library \u2192 AI Lab"
+  },
+  {
+   "area": "Reduced motion",
+   "check": "viva solver works",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Reduced motion",
+   "check": "KB query works",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Reduced motion",
+   "check": "forward chaining works",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Reduced motion",
+   "check": "ANN prediction works",
+   "pass": true,
+   "notes": "high (0.59)MLP final priorityurgentPerceptron binary"
+  },
+  {
+   "area": "Reduced motion",
+   "check": "theme toggle works",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "Reduced motion",
+   "check": "no JS errors / failed requests (reduced motion)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "History & top bar",
+   "check": "History lists every request with its ID and decision (newest first) = GET /api/history",
+   "pass": true,
+   "notes": "REQ105 rejected, REQ104 rejected, REQ103 accepted, REQ102 answered, REQ101 completed"
+  },
+  {
+   "area": "History & top bar",
+   "check": "request counters (top bar + sidebar) match",
+   "pass": true,
+   "notes": "5 / 5"
+  },
+  {
+   "area": "History & top bar",
+   "check": "reopening a History item shows its result",
+   "pass": true,
+   "notes": "REQ103 \u00b7 Full Service Request \u00b7 Ali (student)"
+  },
+  {
+   "area": "History & top bar",
+   "check": "clicking the request counter opens History",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "History & top bar",
+   "check": "dark theme: toggle works, all text contrast >= 3:1",
+   "pass": true,
+   "notes": "all text >= 3:1"
+  },
+  {
+   "area": "History & top bar",
+   "check": "light theme: toggle works, all text contrast >= 3:1",
+   "pass": true,
+   "notes": "all text >= 3:1"
+  },
+  {
+   "area": "History & top bar",
+   "check": "theme choice remembered",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "History & top bar",
+   "check": "no JS errors / failed requests (history / theme)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "General",
+   "check": "reload mid-session: page loads, History kept (loaded from the server)",
+   "pass": true,
+   "notes": "6 items before, 6 after"
+  },
+  {
+   "area": "General",
+   "check": "after reload the next request continues the ids",
+   "pass": true,
+   "notes": "REQ107 after REQ106"
+  },
+  {
+   "area": "General",
+   "check": "no JS errors / failed requests (reload)",
+   "pass": true,
+   "notes": ""
+  },
+  {
+   "area": "General",
+   "check": "server stopped: friendly \"server not reachable\" message, no crash",
+   "pass": true,
+   "notes": "toast: Request failed: Server not reachable. Start it with \"python server.py\", then try again."
+  }
+ ]
+}

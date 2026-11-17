@@ -143,7 +143,7 @@ def order_values(var, assignment, domains, constraints, value_first):
     return first + [value for cost, index, value in scored]
 
 
-def solve_csp(variables, domains, constraints, value_first=None, var_order=None):
+def solve_csp(variables, domains, constraints, value_first=None, var_order=None, log=None):
     """
     Function: solve_csp
     Purpose : Find one solution by backtracking search with MRV (+ degree
@@ -152,7 +152,11 @@ def solve_csp(variables, domains, constraints, value_first=None, var_order=None)
     Params  : variables (list of str), domains (dict var -> list of values),
               constraints (list of (scope tuple, test function)),
               value_first (dict var -> values to try first, optional),
-              var_order (fixed variable order replacing MRV, optional)
+              var_order (fixed variable order replacing MRV, optional),
+              log (list, optional) - if given, every step is appended to it as
+              {"variable", "value", "action"} with action "assign" (value kept
+              after forward checking) or "backtrack" (that assignment undone);
+              used by the web UI to replay the search. Does not change the result.
     Returns : (solution, stats) - solution is a dict var -> value or None;
               stats = {"assignments": int, "backtracks": int}
     """
@@ -182,10 +186,14 @@ def solve_csp(variables, domains, constraints, value_first=None, var_order=None)
             reduced = forward_check(var, value, assignment, current, constraints)
             if reduced is not None:
                 assignment[var] = value
+                if log is not None:
+                    log.append({"variable": var, "value": value, "action": "assign"})
                 result = search(reduced)
                 if result is not None:
                     return result
                 del assignment[var]
+                if log is not None:
+                    log.append({"variable": var, "value": value, "action": "backtrack"})
             stats["backtracks"] += 1
         return None
 

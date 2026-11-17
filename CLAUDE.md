@@ -5,8 +5,8 @@ One person builds the code, but it is split into three student-owned parts that 
 
 ## Goals
 - Simple and easy to explain in a viva, but complete: every handout requirement must work end to end.
-- Main interface = structured CLI form (handout requirement). A CustomTkinter GUI is added later as an extra.
-- Python 3, venv in `venv/`. Allowed libraries: `numpy`, `customtkinter` only (see requirements.txt). Search, Logic and CSP use pure Python.
+- Main interface = structured CLI form (handout requirement). A web UI (`web/` + `server.py`) is the extra interface (see "Web UI" below).
+- Python 3, venv in `venv/`. Allowed libraries: `numpy`, `flask` only (see requirements.txt). Search, Logic and CSP use pure Python; `flask` is used only by `server.py`.
 
 ## Folder rules (do not break)
 ```
@@ -16,11 +16,13 @@ student2_logic_csp/  Logic/KB + CSP Scheduler (Student 2)
 student3_ann/        Perceptron + MLP (Student 3)
 integration/         preprocessing, router, final_response (joint)
 main.py              process_request(request) -> final response dict
-cli.py               structured CLI form (later: gui.py)
+cli.py               structured CLI form
+server.py            Flask server for the web UI (serves web/, implements web/api.js endpoints)
+web/                 single-page UI from Claude Design (index.html, app.js, api.js, styles.css)
 ```
 1. Student folders import ONLY from `shared/`, never from each other.
 2. Only `integration/` and `main.py` connect modules (e.g. integration gets Distance from Search and passes it to the ANN).
-3. AI modules never call `print()` or `input()`. They take a dict and return a dict. Only `cli.py` / `gui.py` do input/output, so the GUI can be added without changing any module.
+3. AI modules never call `print()` or `input()`. They take a dict and return a dict. Only `cli.py` / `server.py` do input/output, so interfaces can be added without changing any module.
 4. Each student folder has its own `*_cli.py` demo and a `test_*.py` file.
 5. Every function (including methods and inner helpers) starts with a comment block / docstring: Function, Purpose, Params, Returns. Each file starts with a header naming the file, module and owning student.
 6. Use the exact names from the handout everywhere. Prefer plain functions and dicts; classes only where they clearly help. No clever tricks.
@@ -109,6 +111,19 @@ Logic is deliberately strict about names and groups: a lowercase term would be r
 - `group_id`: uppercase (g3 -> G3). An unknown but well-formed group (G9) is NOT a preprocessing error: Logic rejects it at "permission" because that is KB knowledge.
 - `category`, `role`, `request_type`: canonical names (AI_Lab_Support, Viva_Scheduling, Access_Request, Maintenance, Emergency_Help; student / instructor / staff; Eligibility_Check, Booking_or_Scheduling, Urgent_Service_Request, Full_Service_Request). Map the CLI wording (Viva/Access) to the encoding names. Logic also tolerates case differences here, but do not rely on it.
 - Locations (`current_location`, `destination`): via Search's `normalize_location`.
+
+## Web UI (extra interface)
+Run: activate the venv (`venv\Scripts\activate` on Windows), then `python server.py`. It serves http://127.0.0.1:5000 and opens the browser (`--port N`, `--no-browser` optional).
+- `web/` is the single-page UI from Claude Design. `web/api.js` is the only file that talks to the backend; `USE_MOCK = false` uses the live Flask API (`true` = built-in mock data with the same response shapes).
+- `server.py` serves `web/` and implements every endpoint in `api.js` (`/api/request`, `/api/demo-scenarios`, `/api/graph`, `/api/search`, `/api/search/compare`, `/api/bookings`, `/api/viva/solve`, `/api/kb`, `/api/kb/query`, `/api/kb/forward`, `/api/ann/predict`, `/api/ann/metrics`, `/api/history`, `/api/reset`). The server contains no AI logic: it calls the existing modules (`main.process_request`, `student1_search`, `student2_logic_csp`, `student3_ann`) and only reshapes their outputs into the JSON the UI reads. Handout response fields are never changed, only added to. Bad input -> HTTP 400 `{"error": ...}`.
+- Demo scenarios in the UI first reset the bookings but keep the request counter (`/api/reset` with `{"keep_counter": true}`), like `cli.py`'s demo mode. Manual form requests use the live bookings.
+- History is kept on the server (`GET /api/history`: every request processed this session, oldest first), so a page reload keeps it. A full Reset clears it; a demo's bookings-only reset does not.
+- UI end-to-end test: `tests_ui/test_ui.py` (Playwright, not part of `run_all_tests.py`; needs `pip install playwright` and `python -m playwright install`). It writes `docs/report/ui_test_results.json` (used by the report) and, with `--shots`, the screenshots in `docs/screenshots/`.
+- Read-only helpers added for the UI (existing behaviour and results unchanged):
+  - `search_module`: every algorithm result has `expanded_order` (expanded nodes in order; `nodes_expanded` = its length).
+  - `csp_scheduler.solve_csp(..., log=None)`: if a list is passed, each assign / backtrack step is appended to it (viva replay).
+  - `ann_module.hidden_activations(features)`: sigmoid outputs of the two MLP hidden layers.
+  - `main.process_request(raw, with_trace=False)`: `with_trace=True` adds a `trace` (pipeline, per-stage status/summary/notes, normalised request, module outputs). The logged response never contains it.
 
 ## Working style
 - Build one part at a time; after each part, run its tests and the acceptance checks above.

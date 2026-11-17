@@ -1,0 +1,70 @@
+$ python cli.py
+Smart Campus AI Decision Support and Automation System
+
+Main menu: 1. New request  2. Run demo scenarios  3. Show current bookings  4. Reset system  5. Exit
+Enter choice: 1
+Enter Name: Ali
+Enter Role (student/instructor/staff): student
+Enter Request Type:
+  1. Navigation_Only
+  2. Eligibility_Check
+  3. Booking_or_Scheduling
+  4. Urgent_Service_Request
+  5. Full_Service_Request
+Enter choice: 5
+Enter Category (AI_Lab_Support / Viva / Access / Maintenance / Emergency): AI_Lab_Support
+Enter Current Location: Hostel
+Enter Preferred Slot (1-4): 2
+Enter Severity (1-10): 8
+Enter Time Sensitivity (1-10): 9
+Enter Crowd Level (1-10): 5
+Do you meet the eligibility requirements? (y/n): y
+Enter Description Note (optional): Need urgent help before practical evaluation.
+------------------------------------------------------------------------------
+  RESPONSE REQ101
+  Decision   : ACCEPTED
+  Priority   : high (MLP, confidence 0.59); Perceptron baseline: urgent
+  Allowed    : yes
+  Assigned   : AI_Lab, slot 3
+  Route      : Hostel -> Cafeteria -> Science_Block -> AI_Lab  (A*, cost 6, 3
+               steps)
+  Message    : Your request has been accepted. You are assigned AI_Lab in slot
+               3. Please follow the recommended route.
+  JSON:
+    {
+      "request_id": "REQ101",
+      "decision": "accepted",
+      "priority": {
+        "binary_priority": "urgent",
+        "final_priority": "high",
+        "confidence": 0.59
+      },
+      "eligibility": {
+        "allowed": true
+      },
+      "assignment": {
+        "room": "AI_Lab",
+        "slot": 3
+      },
+      "route": {
+        "algorithm": "A*",
+        "path": [
+          "Hostel",
+          "Cafeteria",
+          "Science_Block",
+          "AI_Lab"
+        ],
+        "cost": 6,
+        "steps": 3
+      },
+      "message": "Your request has been accepted. You are assigned AI_Lab in slot 3. Please follow the recommended route."
+    }
+------------------------------------------------------------------------------
+
+Main menu: 1. New request  2. Run demo scenarios  3. Show current bookings  4. Reset system  5. Exit
+Enter choice: 4
+System reset: bookings restored to the initial ones, ids restart at REQ101.
+
+Main menu: 1. New request  2. Run demo scenarios  3. Show current bookings  4. Reset system  5. Exit
+Enter choice: 5
+Goodbye.

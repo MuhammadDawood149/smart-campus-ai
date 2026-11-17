@@ -12,9 +12,12 @@ Purpose : Finds routes on the campus graph.
 Rules   : imports only from shared/, never prints, never reads input.
 
 Result dict returned by EVERY algorithm:
-          algorithm_used, path, cost, steps, nodes_expanded, time_ms, found
+          algorithm_used, path, cost, steps, nodes_expanded, time_ms, found,
+          expanded_order
           (steps = number of edges in the path; nodes_expanded = nodes taken
-          off the frontier and examined, including the goal node.)
+          off the frontier and examined, including the goal node;
+          expanded_order = those nodes in the order they were expanded, used
+          by the web UI to animate the search.)
           DLS adds one extra key, "cutoff" (True if the depth limit stopped it).
 """
 
@@ -139,7 +142,7 @@ def make_result(name, path, graph, expanded, start_time, found=True):
     Params  : name (str) - algorithm name
               path (list) - node list (ignored if not found)
               graph (dict) - graph view used to compute the cost
-              expanded (int) - nodes expanded
+              expanded (list) - the expanded nodes, in expansion order
               start_time (float) - time.perf_counter() value at the start
               found (bool)
     Returns : dict
@@ -150,9 +153,10 @@ def make_result(name, path, graph, expanded, start_time, found=True):
         result["path"] = list(path)
         result["cost"] = path_cost(graph, path)
         result["steps"] = len(path) - 1
-    result["nodes_expanded"] = expanded
+    result["nodes_expanded"] = len(expanded)
     result["time_ms"] = (time.perf_counter() - start_time) * 1000
     result["found"] = found
+    result["expanded_order"] = list(expanded)
     return result
 
 
@@ -185,10 +189,10 @@ def bfs(graph, source, goal):
     start = time.perf_counter()
     parent = {source: None}
     queue = deque([source])
-    expanded = 0
+    expanded = []
     while queue:
         node = queue.popleft()
-        expanded += 1
+        expanded.append(node)
         if node == goal:
             return make_result("BFS", trace(parent, node)[::-1], graph, expanded, start)
         for nb in neighbours(graph, node):
@@ -210,12 +214,12 @@ def ucs(graph, source, goal):
     best_g = {source: 0}
     counter = 0                      # tie-breaker so the heap never compares paths
     heap = [(0, counter, source, [source])]
-    expanded = 0
+    expanded = []
     while heap:
         g, _, node, path = heapq.heappop(heap)
         if g > best_g[node]:
             continue                 # stale entry, a cheaper one was already used
-        expanded += 1
+        expanded.append(node)
         if node == goal:
             return make_result("UCS", path, graph, expanded, start)
         for nb in neighbours(graph, node):
@@ -239,12 +243,12 @@ def a_star(graph, source, goal):
     best_g = {source: 0}
     counter = 0
     heap = [(heuristic(source, goal), counter, 0, source, [source])]
-    expanded = 0
+    expanded = []
     while heap:
         _, _, g, node, path = heapq.heappop(heap)
         if g > best_g[node]:
             continue
-        expanded += 1
+        expanded.append(node)
         if node == goal:
             return make_result("A*", path, graph, expanded, start)
         for nb in neighbours(graph, node):
@@ -270,13 +274,13 @@ def dfs(graph, source, goal):
     start = time.perf_counter()
     visited = set()
     stack = [(source, [source])]
-    expanded = 0
+    expanded = []
     while stack:
         node, path = stack.pop()
         if node in visited:
             continue
         visited.add(node)
-        expanded += 1
+        expanded.append(node)
         if node == goal:
             return make_result("DFS", path, graph, expanded, start)
         for nb in reversed(neighbours(graph, node)):   # reversed -> alphabetical first
@@ -291,9 +295,9 @@ def dls_core(graph, source, goal, limit):
     Purpose : Recursive depth-limited search used by DLS and IDS.
               Avoids cycles by never revisiting a node on the current path.
     Params  : graph (dict), source (str), goal (str), limit (int) - max edges
-    Returns : tuple (path or None, cutoff (bool), expanded (int))
+    Returns : tuple (path or None, cutoff (bool), expanded (list of nodes, in order))
     """
-    counter = [0]
+    expanded = []
 
     def recurse(node, path, depth_left):
         """
@@ -302,7 +306,7 @@ def dls_core(graph, source, goal, limit):
         Params  : node (str), path (list), depth_left (int)
         Returns : tuple (path or None, cutoff (bool))
         """
-        counter[0] += 1
+        expanded.append(node)
         if node == goal:
             return path, False
         if depth_left == 0:
@@ -318,7 +322,7 @@ def dls_core(graph, source, goal, limit):
         return None, cutoff
 
     path, cutoff = recurse(source, [source], limit)
-    return path, cutoff, counter[0]
+    return path, cutoff, expanded
 
 
 def dls(graph, source, goal, limit=DEFAULT_DLS_LIMIT):
@@ -348,10 +352,10 @@ def ids(graph, source, goal):
     Returns : result dict
     """
     start = time.perf_counter()
-    expanded = 0
+    expanded = []
     for limit in range(len(graph)):
-        path, cutoff, count = dls_core(graph, source, goal, limit)
-        expanded += count
+        path, cutoff, order = dls_core(graph, source, goal, limit)
+        expanded.extend(order)
         if path is not None:
             return make_result("IDS", path, graph, expanded, start)
         if not cutoff:
@@ -398,20 +402,20 @@ def bidirectional_bfs(graph, source, goal):
     """
     start = time.perf_counter()
     if source == goal:
-        return make_result("Bidirectional BFS", [source], graph, 1, start)
+        return make_result("Bidirectional BFS", [source], graph, [source], start)
     parent_s, depth_s, front_s = {source: None}, {source: 0}, [source]
     parent_g, depth_g, front_g = {goal: None}, {goal: 0}, [goal]
-    expanded = 0
+    expanded = []
     while front_s and front_g:
         if len(front_s) <= len(front_g):
-            expanded += len(front_s)
+            expanded.extend(front_s)
             front_s, best = expand_layer(graph, front_s, parent_s, depth_s, depth_g)
             if best:
                 _, node, other = best                 # node on source side
                 path = trace(parent_s, node)[::-1] + trace(parent_g, other)
                 return make_result("Bidirectional BFS", path, graph, expanded, start)
         else:
-            expanded += len(front_g)
+            expanded.extend(front_g)
             front_g, best = expand_layer(graph, front_g, parent_g, depth_g, depth_s)
             if best:
                 _, node, other = best                 # node on goal side
@@ -432,13 +436,13 @@ def greedy(graph, source, goal):
     visited = set()
     counter = 0
     heap = [(heuristic(source, goal), counter, source, [source])]
-    expanded = 0
+    expanded = []
     while heap:
         _, _, node, path = heapq.heappop(heap)
         if node in visited:
             continue
         visited.add(node)
-        expanded += 1
+        expanded.append(node)
         if node == goal:
             return make_result("Greedy Best-First", path, graph, expanded, start)
         for nb in neighbours(graph, node):
@@ -458,7 +462,7 @@ def rbfs(graph, source, goal):
     Returns : result dict
     """
     start = time.perf_counter()
-    counter = [0]
+    expanded = []
 
     def recurse(node, path, g, f_node, f_limit):
         """
@@ -468,7 +472,7 @@ def rbfs(graph, source, goal):
                   f_node (stored f of this node), f_limit (best alternative f)
         Returns : tuple (path or None, new f-value for this node)
         """
-        counter[0] += 1
+        expanded.append(node)
         if node == goal:
             return path, f_node
         successors = []
@@ -493,8 +497,8 @@ def rbfs(graph, source, goal):
 
     path, _ = recurse(source, [source], 0, heuristic(source, goal), INF)
     if path is None:
-        return make_result("RBFS", [], graph, counter[0], start, found=False)
-    return make_result("RBFS", path, graph, counter[0], start)
+        return make_result("RBFS", [], graph, expanded, start, found=False)
+    return make_result("RBFS", path, graph, expanded, start)
 
 
 # ===========================================================================
@@ -531,7 +535,7 @@ def run_algorithm(name, source, destination, weighted=True, dls_limit=DEFAULT_DL
         raise ValueError("Unknown algorithm: " + str(name))
     graph = WEIGHTED_GRAPH if weighted else UNWEIGHTED_GRAPH
     if source not in graph or destination not in graph:
-        return make_result(name, [], graph, 0, time.perf_counter(), found=False)
+        return make_result(name, [], graph, [], time.perf_counter(), found=False)
     if name == "DLS":
         return dls(graph, source, destination, dls_limit)
     functions = {"BFS": bfs, "UCS": ucs, "A*": a_star, "DFS": dfs, "IDS": ids,

@@ -1,0 +1,63 @@
+$ python student2_logic_csp/logic_csp_cli.py
+
+=== Logic and CSP ===
+1. Run a logic query
+2. Check a service permission
+3. Book a slot
+4. Show current bookings
+5. Solve the viva timetable
+6. Reset bookings
+7. Exit
+Choose 1-7: 1
+Query examples: UsesLab(Ali, Lab1)   Eligible(x, AI)   Instructor(DrKhan, AI)
+Query (blank = back): Eligible(Sara, AI)
+  Entailed    : False
+  Explanation : Eligible(Sara, AI) cannot be proven, so under the closed-world assumption it is false. Via R1: missing Completed(Sara, ProgrammingFundamentals) (not a known fact and no rule derives it).
+
+=== Logic and CSP ===
+1. Run a logic query
+2. Check a service permission
+3. Book a slot
+4. Show current bookings
+5. Solve the viva timetable
+6. Reset bookings
+7. Exit
+Choose 1-7: 1
+Query examples: UsesLab(Ali, Lab1)   Eligible(x, AI)   Instructor(DrKhan, AI)
+Query (blank = back): UsesLab(x, Lab1)
+  Entailed    : True
+  Explanation : UsesLab(x, Lab1) has 3 answer(s): x = Ali (Ali is enrolled in AI, therefore Ali can use Lab1); x = Ahmed (Ahmed is enrolled in AI, therefore Ahmed can use Lab1); x = DrKhan (DrKhan teaches AI, therefore DrKhan is an instructor of AI and can use Lab1).
+    - Enrolled(Ali, AI)
+    - R3: Enrolled(x, AI) => UsesLab(x, Lab1)
+    - Enrolled(Ahmed, AI)
+    - Teaches(DrKhan, AI)
+    - R2: Teaches(x, AI) => Instructor(x, AI)
+    - R4: Instructor(x, AI) => UsesLab(x, Lab1)
+
+=== Logic and CSP ===
+1. Run a logic query
+2. Check a service permission
+3. Book a slot
+4. Show current bookings
+5. Solve the viva timetable
+6. Reset bookings
+7. Exit
+Choose 1-7: 5
+Group with a preferred slot, e.g. G4 (blank = none): 
+  Viva timetable (G4 before G3, no clashes):
+    Slot 1: G1, G5
+    Slot 2: G4, G6
+    Slot 3: -
+    Slot 4: G2, G3
+  Search: 6 assignments tried, 0 backtracks
+
+=== Logic and CSP ===
+1. Run a logic query
+2. Check a service permission
+3. Book a slot
+4. Show current bookings
+5. Solve the viva timetable
+6. Reset bookings
+7. Exit
+Choose 1-7: 7
+Goodbye.

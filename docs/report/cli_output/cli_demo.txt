@@ -1,0 +1,288 @@
+$ python cli.py --demo
+Running 9 demo scenarios (bookings are reset before each one).
+
+==============================================================================
+Demo 1: Navigation_Only: Hostel -> AI_Lab (handout Phase 3 section 9)
+  Raw input: {"name": "Ali", "role": "student", "request_type": "Navigation_Only", "current_location": "hostel", "destination": "ai lab"}
+------------------------------------------------------------------------------
+  RESPONSE REQ101
+  Decision   : COMPLETED
+  Route      : Hostel -> Cafeteria -> Science_Block -> AI_Lab  (A*, cost 6, 3
+               steps)
+  Message    : Best route generated successfully.
+  JSON:
+    {
+      "request_id": "REQ101",
+      "decision": "completed",
+      "route": {
+        "algorithm": "A*",
+        "path": [
+          "Hostel",
+          "Cafeteria",
+          "Science_Block",
+          "AI_Lab"
+        ],
+        "cost": 6,
+        "steps": 3
+      },
+      "message": "Best route generated successfully."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 2: Eligibility_Check: UsesLab(DrKhan, Lab1) (handout Phase 3 section 10)
+  Raw input: {"name": "DrKhan", "role": "instructor", "request_type": "Eligibility_Check", "query": "UsesLab(DrKhan, Lab1)"}
+------------------------------------------------------------------------------
+  RESPONSE REQ102
+  Decision   : ANSWERED
+  Entailed   : yes
+  Explanation: DrKhan teaches AI, therefore DrKhan is an instructor of AI and
+               can use Lab1.
+  Message    : Eligibility query answered successfully.
+  JSON:
+    {
+      "request_id": "REQ102",
+      "decision": "answered",
+      "eligibility": {
+        "entailed": true,
+        "explanation": "DrKhan teaches AI, therefore DrKhan is an instructor of AI and can use Lab1."
+      },
+      "message": "Eligibility query answered successfully."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 3: Booking_or_Scheduling: Ali, AI_Lab_Support, preferred slot 2, from Hostel
+  Raw input: {"name": "ali", "role": "student", "request_type": "Booking_or_Scheduling", "category": "AI_Lab_Support", "preferred_slot": 2, "current_location": "Hostel"}
+------------------------------------------------------------------------------
+  RESPONSE REQ103
+  Decision   : ACCEPTED
+  Allowed    : yes
+  Assigned   : AI_Lab, slot 3
+  Route      : Hostel -> Cafeteria -> Science_Block -> AI_Lab  (A*, cost 6, 3
+               steps)
+  Message    : Booking assigned successfully.
+  JSON:
+    {
+      "request_id": "REQ103",
+      "decision": "accepted",
+      "eligibility": {
+        "allowed": true
+      },
+      "assignment": {
+        "room": "AI_Lab",
+        "slot": 3
+      },
+      "route": {
+        "algorithm": "A*",
+        "path": [
+          "Hostel",
+          "Cafeteria",
+          "Science_Block",
+          "AI_Lab"
+        ],
+        "cost": 6,
+        "steps": 3
+      },
+      "message": "Booking assigned successfully."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 4: Booking_or_Scheduling: Ahmed schedules the viva for group G4, slot 2
+  Raw input: {"name": "Ahmed", "role": "student", "request_type": "Booking_or_Scheduling", "category": "Viva", "group_id": "g4", "preferred_slot": 2}
+------------------------------------------------------------------------------
+  RESPONSE REQ104
+  Decision   : ACCEPTED
+  Allowed    : yes
+  Assigned   : Exam_Hall, slot 2
+  Message    : Booking assigned successfully.
+  JSON:
+    {
+      "request_id": "REQ104",
+      "decision": "accepted",
+      "eligibility": {
+        "allowed": true
+      },
+      "assignment": {
+        "room": "Exam_Hall",
+        "slot": 2
+      },
+      "message": "Booking assigned successfully."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 5: Urgent_Service_Request: Bilal (staff), Emergency_Help from Bus_Stop
+  Raw input: {"name": "Bilal", "role": "staff", "request_type": "Urgent_Service_Request", "category": "Emergency", "current_location": "Bus Stop", "severity": 9, "time_sensitivity": 9, "crowd_level": 6, "eligibility_claim": true, "description_note": "Student fainted near the bus stop."}
+------------------------------------------------------------------------------
+  RESPONSE REQ105
+  Decision   : ACCEPTED
+  Priority   : urgent (MLP, confidence 1.00); Perceptron baseline: urgent
+  Allowed    : yes
+  Assigned   : Medical_Center, slot 1
+  Route      : Bus_Stop -> Medical_Center  (A*, cost 2, 1 step)
+  Message    : Your request has been accepted. You are assigned Medical_Center
+               in slot 1. Please follow the recommended route.
+  JSON:
+    {
+      "request_id": "REQ105",
+      "decision": "accepted",
+      "priority": {
+        "binary_priority": "urgent",
+        "final_priority": "urgent",
+        "confidence": 1.0
+      },
+      "eligibility": {
+        "allowed": true
+      },
+      "assignment": {
+        "room": "Medical_Center",
+        "slot": 1
+      },
+      "route": {
+        "algorithm": "A*",
+        "path": [
+          "Bus_Stop",
+          "Medical_Center"
+        ],
+        "cost": 2,
+        "steps": 1
+      },
+      "message": "Your request has been accepted. You are assigned Medical_Center in slot 1. Please follow the recommended route."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 6: Full_Service_Request: the handout example (Phase 3 section 11)
+  Raw input: {"name": "Ali", "role": "student", "request_type": "Full_Service_Request", "category": "AI_Lab_Support", "current_location": "Hostel", "preferred_slot": 2, "severity": 8, "time_sensitivity": 9, "crowd_level": 5, "eligibility_claim": true, "description_note": "Need urgent help before practical evaluation."}
+------------------------------------------------------------------------------
+  RESPONSE REQ106
+  Decision   : ACCEPTED
+  Priority   : high (MLP, confidence 0.59); Perceptron baseline: urgent
+  Allowed    : yes
+  Assigned   : AI_Lab, slot 3
+  Route      : Hostel -> Cafeteria -> Science_Block -> AI_Lab  (A*, cost 6, 3
+               steps)
+  Message    : Your request has been accepted. You are assigned AI_Lab in slot
+               3. Please follow the recommended route.
+  JSON:
+    {
+      "request_id": "REQ106",
+      "decision": "accepted",
+      "priority": {
+        "binary_priority": "urgent",
+        "final_priority": "high",
+        "confidence": 0.59
+      },
+      "eligibility": {
+        "allowed": true
+      },
+      "assignment": {
+        "room": "AI_Lab",
+        "slot": 3
+      },
+      "route": {
+        "algorithm": "A*",
+        "path": [
+          "Hostel",
+          "Cafeteria",
+          "Science_Block",
+          "AI_Lab"
+        ],
+        "cost": 6,
+        "steps": 3
+      },
+      "message": "Your request has been accepted. You are assigned AI_Lab in slot 3. Please follow the recommended route."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 7: Rejected at Logic: Sara asks for AI_Lab_Support (no ProgrammingFundamentals)
+  Raw input: {"name": "sara", "role": "student", "request_type": "Booking_or_Scheduling", "category": "AI_Lab_Support", "preferred_slot": 1}
+------------------------------------------------------------------------------
+  RESPONSE REQ107
+  Decision   : REJECTED
+  Rejected at: logic
+  Reason     : CanRequest(Sara, AI_Lab_Support) cannot be proven; missing
+               premise(s): Completed(Sara, ProgrammingFundamentals),
+               Teaches(Sara, AI).
+  Allowed    : no
+  Explanation: Step 1 (role authorization) passed: Sara is a student. Step 2
+               (permission) failed: CanRequest(Sara, AI_Lab_Support) cannot be
+               proven, so under the closed-world assumption it is false. Via
+               R8 -> R1: missing Completed(Sara, ProgrammingFundamentals) (not
+               a known fact and no rule derives it). Via R9 -> R2: missing
+               Teaches(Sara, AI) (not a known fact and no rule derives it).
+  Message    : Your request has been rejected because you are not eligible for
+               this service.
+  JSON:
+    {
+      "request_id": "REQ107",
+      "decision": "rejected",
+      "eligibility": {
+        "allowed": false,
+        "explanation": "Step 1 (role authorization) passed: Sara is a student. Step 2 (permission) failed: CanRequest(Sara, AI_Lab_Support) cannot be proven, so under the closed-world assumption it is false. Via R8 -> R1: missing Completed(Sara, ProgrammingFundamentals) (not a known fact and no rule derives it). Via R9 -> R2: missing Teaches(Sara, AI) (not a known fact and no rule derives it)."
+      },
+      "rejected_at": "logic",
+      "reason": "CanRequest(Sara, AI_Lab_Support) cannot be proven; missing premise(s): Completed(Sara, ProgrammingFundamentals), Teaches(Sara, AI).",
+      "message": "Your request has been rejected because you are not eligible for this service."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 8: Rejected at Logic: Ali tries to schedule G4's viva (Ali is in G3)
+  Raw input: {"name": "Ali", "role": "student", "request_type": "Booking_or_Scheduling", "category": "Viva_Scheduling", "group_id": "G4", "preferred_slot": 3}
+------------------------------------------------------------------------------
+  RESPONSE REQ108
+  Decision   : REJECTED
+  Rejected at: logic
+  Reason     : CanScheduleViva(Ali, G4) cannot be proven; missing premise(s):
+               MemberOf(Ali, G4), Supervises(Ali, G4).
+  Allowed    : no
+  Explanation: Step 1 (role authorization) passed: Ali is a student. Step 2
+               (permission) failed: Ali is neither a member nor the supervisor
+               of G4. CanScheduleViva(Ali, G4) cannot be proven, so under the
+               closed-world assumption it is false. Via R10: missing
+               MemberOf(Ali, G4) (not a known fact and no rule derives it).
+               Via R11: missing Supervises(Ali, G4) (not a known fact and no
+               rule derives it).
+  Message    : Your request has been rejected because you are not eligible for
+               this service.
+  JSON:
+    {
+      "request_id": "REQ108",
+      "decision": "rejected",
+      "eligibility": {
+        "allowed": false,
+        "explanation": "Step 1 (role authorization) passed: Ali is a student. Step 2 (permission) failed: Ali is neither a member nor the supervisor of G4. CanScheduleViva(Ali, G4) cannot be proven, so under the closed-world assumption it is false. Via R10: missing MemberOf(Ali, G4) (not a known fact and no rule derives it). Via R11: missing Supervises(Ali, G4) (not a known fact and no rule derives it)."
+      },
+      "rejected_at": "logic",
+      "reason": "CanScheduleViva(Ali, G4) cannot be proven; missing premise(s): MemberOf(Ali, G4), Supervises(Ali, G4).",
+      "message": "Your request has been rejected because you are not eligible for this service."
+    }
+------------------------------------------------------------------------------
+
+==============================================================================
+Demo 9: Rejected at preprocessing: unknown location Sports_Complex
+  Raw input: {"name": "Ali", "role": "student", "request_type": "Navigation_Only", "current_location": "Hostel", "destination": "Sports_Complex"}
+------------------------------------------------------------------------------
+  RESPONSE REQ109
+  Decision   : REJECTED
+  Rejected at: preprocessing
+  Reason     : destination: Unknown location 'Sports_Complex'. Valid
+               locations: Main_Gate, Parking, Admin_Block, Student_Services,
+               Exam_Hall, Seminar_Room, Library, AI_Lab, Bus_Stop,
+               Medical_Center, Cafeteria, Science_Block, Hostel
+  Message    : Your request has been rejected because the request details are
+               invalid.
+  JSON:
+    {
+      "request_id": "REQ109",
+      "decision": "rejected",
+      "rejected_at": "preprocessing",
+      "reason": "destination: Unknown location 'Sports_Complex'. Valid locations: Main_Gate, Parking, Admin_Block, Student_Services, Exam_Hall, Seminar_Room, Library, AI_Lab, Bus_Stop, Medical_Center, Cafeteria, Science_Block, Hostel",
+      "message": "Your request has been rejected because the request details are invalid."
+    }
+------------------------------------------------------------------------------
+Demo finished; bookings are back to the initial ones.

@@ -11,11 +11,17 @@ const USE_MOCK = false;
 const API_BASE = '/api';
 
 async function http(method, path, body) {
-  const res = await fetch(API_BASE + path, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(API_BASE + path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (_) {
+    // fetch() only throws when no response arrives at all (server stopped / network down).
+    throw new Error('Server not reachable. Start it with "python server.py", then try again.');
+  }
   if (!res.ok) {
     let detail = '';
     try { detail = (await res.json()).error || ''; } catch (_) { /* ignore */ }
@@ -37,6 +43,8 @@ const API = {
   kbForward: () => USE_MOCK ? mockCall(() => Mock.forward()) : http('POST', '/kb/forward', {}),
   annPredict: (body) => USE_MOCK ? mockCall(() => Mock.predict(body.features)) : http('POST', '/ann/predict', body),
   annMetrics: () => USE_MOCK ? mockCall(() => Mock.metrics()) : http('GET', '/ann/metrics'),
+  // Every request processed this session, oldest first: [{request, response, time}] (History survives a reload).
+  history: () => USE_MOCK ? mockCall(() => Mock.history()) : http('GET', '/history'),
   reset: () => USE_MOCK ? mockCall(() => Mock.reset()) : http('POST', '/reset', {}),
   // Bookings only (request ids keep counting): run before every demo scenario, like cli.py's demo mode.
   resetBookings: () => USE_MOCK ? mockCall(() => Mock.resetBookings()) : http('POST', '/reset', { keep_counter: true }),
@@ -542,6 +550,7 @@ const Mock = (() => {
     Full_Service_Request: ['category', 'current_location', 'preferred_slot', 'severity', 'time_sensitivity', 'crowd_level'],
   };
   let reqCounter = 0;
+  const historyLog = [];
 
   const routeOf = (r) => ({ algorithm: r.algorithm_used, path: r.path, cost: r.cost, steps: r.steps, nodes_expanded: r.nodes_expanded });
   const empty = (v) => v === undefined || v === null || v === '';
@@ -714,8 +723,11 @@ const Mock = (() => {
     bookings: () => bookingsState,
     solveViva,
     kb: () => ({ facts: FACT_TEXT, rules: RULES.map(({ id, text, source }) => ({ id, text, source })) }),
-    query, forward, predict, metrics, processRequest,
-    reset: () => { bookingsState = BASE_BOOKINGS.map((x) => ({ ...x })); reqCounter = 0; return { ok: true }; },
+    query, forward, predict, metrics,
+    // Like the server, remember every processed request of the session (GET /api/history).
+    processRequest: (b) => { const res = processRequest(b); historyLog.push({ request: b, response: res, time: new Date().toISOString() }); return res; },
+    history: () => historyLog,
+    reset: () => { bookingsState = BASE_BOOKINGS.map((x) => ({ ...x })); reqCounter = 0; historyLog.length = 0; return { ok: true }; },
     resetBookings: () => { bookingsState = BASE_BOOKINGS.map((x) => ({ ...x })); return { ok: true }; },
   };
 })();

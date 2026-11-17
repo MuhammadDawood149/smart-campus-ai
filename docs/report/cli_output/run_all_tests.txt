@@ -1,0 +1,8 @@
+$ python run_all_tests.py
+Student 1 - Search     student1_search/test_search.py             29 tests  PASS     0.3s  OK
+Student 2 - Logic/CSP  student2_logic_csp/test_logic.py           63 tests  PASS     0.2s  OK
+Student 2 - Logic/CSP  student2_logic_csp/test_logic_csp.py       36 tests  PASS     0.2s  OK
+Student 3 - ANN        student3_ann/test_ann.py                   19 tests  PASS    29.1s  OK
+Integration            test_integration.py                        28 tests  PASS     0.6s  OK
+------------------------------------------------------------------------------
+TOTAL: 175 tests in 5 files, all passed

@@ -101,28 +101,33 @@ def logic_reason(logic):
         logic["query"], ", ".join(logic["missing"]))
 
 
-def run_pipeline(request, router_output):
+def run_pipeline(request, router_output, outputs=None):
     """
     Function: run_pipeline
     Purpose : Run the selected modules in order and build the final response.
               ANN -> Logic_KB -> (Allowed?) -> CSP -> Search. The CSP booking is
               undone if a later stage (Search) fails, so a rejected request never
               keeps a booking.
-    Params  : request (dict) - preprocessed request, router_output (dict)
+    Params  : request (dict) - preprocessed request, router_output (dict),
+              outputs (dict, optional) - if given, each module's raw output is
+              stored in it under "ann" / "logic" / "csp" / "search" (for the trace)
     Returns : dict - final response
     """
     rid = request["request_id"]
     pipeline = router_output["selected_pipeline"]
     request_type = request["request_type"]
     priority = logic = csp = search = None
+    outputs = {} if outputs is None else outputs
 
     if "ANN" in pipeline:
         priority = predict_priority(request["ann_features"])
+        outputs["ann"] = priority
         if priority.get("error"):
             return fr.rejection_response(rid, "ann", priority["error"])
 
     if "Logic_KB" in pipeline:
         logic = check_logic(request)
+        outputs["logic"] = logic
         if request_type == "Eligibility_Check":
             if logic.get("error"):
                 return fr.rejection_response(rid, "logic", logic["explanation"])
@@ -134,11 +139,13 @@ def run_pipeline(request, router_output):
     if "CSP" in pipeline:
         csp = csp_scheduler.schedule(request, priority["final_priority"] if priority else None,
                                      SESSION["csp"])
+        outputs["csp"] = csp
         if csp["decision"] != "accepted":
             return fr.rejection_response(rid, "csp", csp["notes"], priority, logic)
 
     if "Search" in pipeline:
         search = run_search(request, csp)
+        outputs["search"] = search
         if not search["success"]:
             SESSION["csp"].clear()
             SESSION["csp"].update(saved_bookings)          # undo the booking
@@ -151,7 +158,79 @@ def run_pipeline(request, router_output):
     return fr.service_response(rid, priority, csp, search)
 
 
-def process_request(raw_request):
+TRACE_STAGES = {"ANN": "ann", "Logic_KB": "logic", "CSP": "csp", "Search": "search"}
+
+
+def stage_summary(stage, output, request):
+    """
+    Function: stage_summary
+    Purpose : One short line saying what a module produced, for the trace.
+    Params  : stage (str) - "ann" / "logic" / "csp" / "search"
+              output (dict) - that module's raw output, request (dict)
+    Returns : (ok (bool), summary (str), notes (str))
+    """
+    if stage == "ann":
+        if output.get("error"):
+            return False, "prediction failed", output["error"]
+        return True, "%s (%.2f)" % (output["final_priority"], output["confidence"]), ""
+    if stage == "logic":
+        if request["request_type"] == "Eligibility_Check":
+            return True, "entailed" if output["entailed"] else "not entailed", ""
+        if output["allowed"]:
+            return True, "allowed", ""
+        return False, "not allowed", logic_reason(output)
+    if stage == "csp":
+        if output["decision"] == "accepted":
+            return True, "%s slot %d" % (output["assigned_room"], output["assigned_slot"]), \
+                output["notes"]
+        return False, "no feasible slot", output["notes"]
+    if output["success"]:
+        route_info = output["route"]
+        return True, "%s cost %s" % (route_info["algorithm"], route_info["cost"]), ""
+    return False, "no route", output["error"]
+
+
+def build_trace(request, pipeline, outputs, response):
+    """
+    Function: build_trace
+    Purpose : Read-only record of how a request went through the system, for
+              the web UI: the router's pipeline, one entry per stage that ran
+              (status ok / rejected, a short summary, notes), the normalised
+              request and every module's raw output.
+    Params  : request (dict) - preprocessed request, pipeline (list) - selected
+              modules ([] when the request never reached the router),
+              outputs (dict) - module outputs from run_pipeline, response (dict)
+    Returns : dict {"pipeline", "stages": [{"stage", "status", "summary", "notes"}],
+                    "request", "modules"}
+    """
+    def stage(name, ok, summary, notes=""):
+        """
+        Function: stage
+        Purpose : Build one trace entry.
+        Params  : name (str), ok (bool), summary (str), notes (str)
+        Returns : dict
+        """
+        return {"stage": name, "status": "ok" if ok else "rejected",
+                "summary": summary, "notes": notes}
+
+    rejected_at = response.get("rejected_at")
+    if rejected_at == "preprocessing":
+        stages = [stage("preprocessing", False, "invalid input", response["reason"])]
+    else:
+        stages = [stage("preprocessing", True, "validated and normalised"),
+                  stage("router", True, " -> ".join(pipeline))]
+        for module in pipeline:
+            name = TRACE_STAGES[module]
+            if name not in outputs:
+                break                                   # not reached
+            stages.append(stage(name, *stage_summary(name, outputs[name], request)))
+        if rejected_at == "system":
+            stages.append(stage("system", False, "internal error", response["reason"]))
+    return {"pipeline": list(pipeline), "stages": stages,
+            "request": request, "modules": outputs}
+
+
+def process_request(raw_request, with_trace=False):
     """
     Function: process_request
     Purpose : Handle one request end to end: preprocess, route, run the
@@ -159,21 +238,27 @@ def process_request(raw_request):
     Params  : raw_request (dict) - raw fields, e.g. {"name": "Ali", "role": "student",
               "request_type": "Navigation_Only", "current_location": "Hostel",
               "destination": "AI_Lab"}
+              with_trace (bool) - True adds a "trace" key (see build_trace) to the
+              returned response; the logged response never has it
     Returns : dict - final response in the handout 6.x / 3.4 format
     """
     request, error = preprocess(raw_request, SESSION)
     rid = request["request_id"]
+    pipeline, outputs = [], {}
     if error:
         response = fr.rejection_response(rid, "preprocessing", error)
     else:
         router_output = route(request)
+        pipeline = router_output["selected_pipeline"]
         if not router_output["selected_pipeline"]:
             response = fr.rejection_response(rid, "preprocessing", "unsupported request_type %r"
                                              % request["request_type"])
         else:
             try:
-                response = run_pipeline(request, router_output)
+                response = run_pipeline(request, router_output, outputs)
             except Exception as exc:       # never let an error escape to the caller
                 response = fr.rejection_response(rid, "system", "internal error: %s" % exc)
     log_response(response)
+    if with_trace:
+        return dict(response, trace=build_trace(request, pipeline, outputs, response))
     return response

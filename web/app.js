@@ -293,7 +293,7 @@ function fillForm(req) {
 function clearForm(resetType = true) {
   const f = $('#req-form');
   $$('option[data-temp]', f).forEach((o) => o.remove());
-  f.name.value = '';
+  f.name.value = ''; f.role.value = 'student';
   f.current_location.value = ''; f.destination.value = ''; f.query.value = '';
   f.category.selectedIndex = 0; f.group_id.value = 'G4';
   $('input[name="preferred_slot"][value="2"]').checked = true;
@@ -1452,6 +1452,13 @@ async function init() {
   if (kb) { S.kb = kb; renderKB(); }
   if (metrics) renderMetrics(metrics);
   await refreshBookings();
+  await loadHistory();
+}
+
+// History lives on the server (GET /api/history), so a page reload keeps it. Newest first in the UI.
+async function loadHistory() {
+  const list = await safe(() => API.history(), 'Could not load history');
+  if (list) S.history = list.slice().reverse().map((e) => ({ res: e.response, body: e.request, time: new Date(e.time) }));
   renderHistory();
 }
 

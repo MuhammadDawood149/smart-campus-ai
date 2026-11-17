@@ -152,6 +152,27 @@ def explain_prediction(features):
     return result
 
 
+def hidden_activations(features):
+    """
+    Function: hidden_activations
+    Purpose : The sigmoid outputs of both MLP hidden layers for one request,
+              so the web UI can light up the 7 -> 4 -> 3 -> 4 network.
+              Read-only: uses the same forward pass as predict_priority.
+    Params  : features (list of 7 raw numbers in FEATURE_ORDER)
+    Returns : dict {"hidden1": 4 floats, "hidden2": 3 floats}; or the error result
+    """
+    values, error = validate_features(features)
+    if error:
+        return error_result(error)
+    try:
+        models, _ = load_models()
+        cache = mlp.forward(models["mlp"], np.atleast_2d(ds.scale_features(values)))
+    except Exception as exc:    # never let a model problem crash the caller
+        return error_result("ANN model unavailable: %s" % exc)
+    return {"hidden1": [round(float(v), 4) for v in cache["A1"][0]],
+            "hidden2": [round(float(v), 4) for v in cache["A2"][0]]}
+
+
 def predict_priority(features):
     """
     Function: predict_priority
